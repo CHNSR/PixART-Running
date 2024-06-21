@@ -16,6 +16,7 @@ void main() {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
+  void showMainWigget() {}
 
   // This widget is the root of your application.
   @override
@@ -34,7 +35,7 @@ class MyApp extends StatelessWidget {
             children: [
               const Expanded(
                 flex: 9,
-                child: HomeContent(),
+                child: HomeContent(), // ต้องแก้ตร
               ),
               SizedBox(
                 height: MediaQuery.of(context).size.height * 0.1,
