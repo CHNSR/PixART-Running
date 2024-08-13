@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1026990396626",
+    "project_id": "testbar4",
+    "storage_bucket": "testbar4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1026990396626:android:822a9dd016e83265adc90b",
+        "android_client_info": {
+          "package_name": "com.testbar4.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC_oCcHNI4ue9p1StzJSK9X_PvrjWi78tg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
