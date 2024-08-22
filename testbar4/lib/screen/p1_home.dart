@@ -3,6 +3,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:testbar4/database/Fire_Activity.dart';
 import 'package:testbar4/manage/manage_icon/icon_path.dart';
 import 'package:testbar4/screen/layer2/activity/componente/activityCP.dart';
+import 'package:testbar4/screen/layer2/heatmap/heatmapCP.dart';
 
 class P1Home extends StatefulWidget {
   const P1Home({super.key});
@@ -27,12 +28,9 @@ class _P1HomeState extends State<P1Home> {
                 const SizedBox(height: 20),
                 const CircleAvatar(
                   radius: 100,
-                  backgroundImage:
-                      NetworkImage('https://via.placeholder.com/150'),
                 ),
                 const SizedBox(height: 20),
                 Container(
-                  height: 1200,
                   width: double.infinity,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
@@ -70,27 +68,13 @@ class _P1HomeState extends State<P1Home> {
                           color: Colors.black,
                         ),
                       ),
-                      // Space for ACcard data
-
-                      const Expanded(
-                        child: CardAc(
-                          numOfCard: 3,
-                        ),
+                      const CardAc(
+                        numOfCard: 3,
                       ),
-
-                      /*
-                      Container(
-                        height: 200,
-                        width: 200,
-                        color: Colors.white,
-                        child: ActivityMap(activities: [activity]),
-                      )
-                      */
                     ],
                   ),
                 ),
                 const SizedBox(height: 25),
-                //container for chart
                 Container(
                   height: 500,
                   width: double.infinity,
@@ -130,6 +114,10 @@ class _P1HomeState extends State<P1Home> {
                           color: Colors.black,
                         ),
                       ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      HeatmapCP()
                     ],
                   ),
                 ),

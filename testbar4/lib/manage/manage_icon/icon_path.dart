@@ -49,6 +49,18 @@ class IconPath {
     "delete_outline": "assets/image/icon/delete_outline.png",
     "delete_select": "assets/image/icon/delete_select.png",
     "deleteDoc_outline": "assets/image/icon/deleteDoc_outline.png",
+    //navigator
+    "navigation_outline": "assets/image/icon/navigation_outline.png",
+    "navigation_select": "assets/image/icon/navigation_select.png",
+    //add location button
+    "addLocationPR_outline": "assets/image/icon/addLocationPR_outline.png",
+    "addLocationPL_outline": "assets/image/icon/addLocationPR_outline.png",
+    //coin
+    "coin_outline": "assets/image/icon/coin_outline.png",
+    //distance
+    "distance_outline": "assets/image/icon/distance_outline.png",
+    //clock
+    "clock_outline": "assets/image/icon/clock_outline.png",
   };
 
   String appBarIcon(String type) {

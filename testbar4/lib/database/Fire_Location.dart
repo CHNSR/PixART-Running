@@ -10,19 +10,28 @@ class Location {
   // Save route
   static Future<void> addRoute({
     required List routeData,
-    required int distance,
+    required double distance,
     required String name,
+    required bool status,
   }) async {
-    final visit = 0;
+    if (user == null) {
+      print("Error: No user logged in.");
+      return;
+    }
+
+    final userId = user!.uid;
+    const visit = 0;
     try {
-      await firestore.collection("Location").add({
+      await firestore.collection("Location").doc(userId).set({
         'route': routeData,
         'distance': distance,
         'name': name,
         'visited': visit,
+        'private': status,
       });
+      print("[Fire_Location][addRoute] Saved private location");
     } catch (e) {
-      print('Failed to add route: $e');
+      print('[Fire_Location][addRoute] Failed to add route: $e');
     }
   }
 
@@ -32,6 +41,7 @@ class Location {
     try {
       final snapshot =
           await FirebaseFirestore.instance.collection('Location').get();
+      print('Location form fire: $snapshot');
       return snapshot.docs;
     } catch (e) {
       print('Failed to fetch locations: $e');
@@ -59,4 +69,33 @@ class Location {
       print('Failed to add visit: $e');
     }
   }
+
+  //fetch route
+
+  static Future<Map<String, dynamic>?> fetchRouteById(String documentID) async {
+    try {
+      // Fetch specific document by documentID
+      final docSnapshot = await FirebaseFirestore.instance
+          .collection('Location')
+          .doc(documentID)
+          .get();
+
+      if (docSnapshot.exists) {
+        final data = docSnapshot.data() as Map<String, dynamic>;
+        final route = data['route'];
+
+        return {
+          'docID': docSnapshot.id,
+          'route': route,
+        };
+      } else {
+        print('No such document exists with ID: $documentID');
+        return null;
+      }
+    } catch (e) {
+      print('Failed to fetch route for documentID: $documentID - Error: $e');
+      return null;
+    }
+  }
+  //add Private route
 }

@@ -167,8 +167,6 @@ class _RunPageState extends State<P3Run> {
     });
     _stopWatchTimer.onStopTimer();
     // Optionally, you can add code here to save the tracking data
-    //save data in firestore
-    _saveRunData();
   }
 
   //save route and store in firebase
@@ -181,13 +179,19 @@ class _RunPageState extends State<P3Run> {
       };
     }).toList();
 
+    // Get time in milliseconds from StopWatchTimer
+    final durationInMilliseconds = _stopWatchTimer.rawTime.value;
+
     //store data in firebase
     Activity.addActivity(
-      distance: _dist.toStringAsFixed(2),
-      date: DateTime.now(),
+      distance: _dist,
+      finishdate: DateTime.now(),
       avgPace: _speedCounter == 0 ? 0 : _avgSpeed / _speedCounter,
       routeData: routeData,
+      time: durationInMilliseconds,
     );
+
+    print("[P3] Check call func _savedata to fire ");
   }
 
   @override
@@ -282,19 +286,6 @@ class _RunPageState extends State<P3Run> {
                           onPressed: () async {
                             if (_isRunning) {
                               _stopTracking();
-                              /*
-                              // Save data to database
-                              Entry en = Entry(
-                                date: DateFormat.yMMMMd('en_US')
-                                    .format(DateTime.now()),
-                                duration: _displayTime,
-                                speed: _speedCounter == 0
-                                    ? 0
-                                    : _avgSpeed / _speedCounter,
-                                distance: _dist,
-                              );
-                              */
-                              // Insert `en` to your database here
                             } else {
                               _startTracking();
                             }
@@ -307,6 +298,9 @@ class _RunPageState extends State<P3Run> {
                         if (!_isRunning)
                           IconButton(
                             onPressed: () {
+                              print("[P3]---------Tap save data---------");
+                              //save date to firestore
+                              _saveRunData();
                               Navigator.pushNamed(context, '/main');
                             },
                             icon: const Icon(
