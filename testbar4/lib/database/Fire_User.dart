@@ -142,4 +142,22 @@ class PixARTUser {
       print('Failed to update user profile: $e');
     }
   }
+  //is Admin
+   static Future<bool> isAdmin() async {
+    try {
+      // Fetch user data from Firestore
+      final userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(FirebaseAuth.instance.currentUser?.uid)
+          .get();
+
+      if (userDoc.exists) {
+        final data = userDoc.data() as Map<String, dynamic>;
+        return data['role'] == 'admin'; // Check if the role field is 'admin'
+      }
+    } catch (e) {
+      print('Error checking admin status: $e');
+    }
+    return false;
+  }
 }

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:uuid/uuid.dart'; // For generating unique IDs
 
 final firestore = FirebaseFirestore.instance;
 final auth = FirebaseAuth.instance;
@@ -9,7 +10,7 @@ class PixARTShoes {
   // Add shoes with auto-generated document ID
   static Future<void> addShoes({
     required String shoesName,
-    required String shoesRange,
+    required double shoesRange,
     required String startUse,
   }) async {
     try {
@@ -18,8 +19,10 @@ class PixARTShoes {
         return;
       }
       final runnerID = user?.uid;
+      final shoesID = Uuid().v4(); // Generate a unique ID for the shoes
 
       await firestore.collection("Shoes").add({
+        "shoesID": shoesID,
         "runnerID": runnerID,
         "startUse": startUse,
         "shoesName": shoesName,
@@ -45,8 +48,7 @@ class PixARTShoes {
     return snapshot.docs;
   }
 
-  //stream shoes
-  // สตรีมของรองเท้าที่เป็นของผู้ใช้ปัจจุบัน
+  // Stream shoes
   static Stream<List<DocumentSnapshot>> streamShoes() {
     if (user == null) {
       throw Exception('User not logged in');
@@ -62,24 +64,43 @@ class PixARTShoes {
 
   // Update distance
   static Future<void> updateDistance({
-    required String documentID,
+    required String shoesID,
     required double newDistance,
   }) async {
     try {
-      await firestore.collection('Shoes').doc(documentID).update({
-        'distance': newDistance,
-      });
+      final querySnapshot = await firestore
+          .collection('Shoes')
+          .where('shoesID', isEqualTo: shoesID)
+          .limit(1)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        await firestore.collection('Shoes').doc(querySnapshot.docs.first.id).update({
+          'distance': newDistance,
+        });
+      } else {
+        throw Exception('Shoe not found');
+      }
     } catch (e) {
       print('Failed to update distance: $e');
     }
   }
 
   // Delete shoes
-  static Future<String> deleteShoes(String documentID) async {
+  static Future<String> deleteShoes(String shoesID) async {
     try {
-      await firestore.collection('Shoes').doc(documentID).delete();
+      final querySnapshot = await firestore
+          .collection('Shoes')
+          .where('shoesID', isEqualTo: shoesID)
+          .limit(1)
+          .get();
 
-      return "Shoes deleted successfully!";
+      if (querySnapshot.docs.isNotEmpty) {
+        await firestore.collection('Shoes').doc(querySnapshot.docs.first.id).delete();
+        return "Shoes deleted successfully!";
+      } else {
+        throw Exception('Shoe not found');
+      }
     } catch (e) {
       return 'Failed to delete shoes: $e';
     }

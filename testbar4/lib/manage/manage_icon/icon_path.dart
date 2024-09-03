@@ -61,6 +61,22 @@ class IconPath {
     "distance_outline": "assets/image/icon/distance_outline.png",
     //clock
     "clock_outline": "assets/image/icon/clock_outline.png",
+    //best
+    "best_outline": "assets/image/icon/best_outline.png",
+    //fast 
+    "fast_outline": "assets/image/icon/fast_outline.png",
+    //letsGo
+    "letsGo_outline": "assets/image/icon/letsGo_outline.png",
+    //finish
+    "finish_outline": "assets/image/icon/finish_outline.png",
+    //square
+    "square_outline":"assets/image/icon/square_outline.png",
+    //stop
+    "stop_outline":"assets/image/icon/stop_outline.png",
+    //select shoes to track running
+    "shoesSelection_outline":"assets/image/icon/shoesSelection_outline.png",
+    "shoesSelection_select":"assets/image/icon/shoesSelection_select.png",
+    
   };
 
   String appBarIcon(String type) {

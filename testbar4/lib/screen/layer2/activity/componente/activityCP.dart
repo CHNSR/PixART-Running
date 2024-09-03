@@ -96,7 +96,7 @@ class _ActivityMapState extends State<ActivityMap> {
 class CardAc extends StatefulWidget {
   const CardAc({super.key, required this.numOfCard});
 
-  final int numOfCard;
+  final dynamic numOfCard;
 
   @override
   State<CardAc> createState() => _CardAcState();
@@ -126,6 +126,8 @@ class _CardAcState extends State<CardAc> {
   @override
   void initState() {
     super.initState();
+    //call initialize to get user id form provider and use it to fetch data
+    Activity.initialize();
     _activitiesFuture = Activity.fetchActivity(numOfFetch: widget.numOfCard)
         as Future<List<Map<String, dynamic>>>?;
   }

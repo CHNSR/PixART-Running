@@ -67,10 +67,8 @@ class _HeatmapCPState extends State<HeatmapCP> {
         13: Colors.purple,
       },
       size: 40,
-      onClick: (value) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(value.toString())));
-      },
+      flexible: true,
+      weekTextColor: Colors.black,
     );
   }
 }

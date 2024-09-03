@@ -176,7 +176,6 @@ class _AddRangeOfShoesState extends State<AddRangeOfShoes> {
 }
 
 //add shoes button
-// add shoes button
 class AddShoesButton extends StatelessWidget {
   final TextEditingController NameOfShoesController;
   final TextEditingController DateOfShoesController;
@@ -192,11 +191,11 @@ class AddShoesButton extends StatelessWidget {
 
   Future<void> _addShoes(BuildContext context) async {
     final nameShoes = NameOfShoesController.text;
-    final distanceShoes = DistanceOfShoesController.text;
+    final distanceShoesString = DistanceOfShoesController.text;
     final dateShoes = DateOfShoesController.text;
 
     // Validation fields Empty?
-    if (nameShoes.isEmpty || dateShoes.isEmpty || distanceShoes.isEmpty) {
+    if (nameShoes.isEmpty || dateShoes.isEmpty || distanceShoesString.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -208,6 +207,24 @@ class AddShoesButton extends StatelessWidget {
         ),
       );
       return; // Exit the function if validation fails
+    }
+
+    // Convert distanceShoesString to double
+    double? distanceShoes;
+    try {
+      distanceShoes = double.parse(distanceShoesString);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            "Invalid distance format.",
+            style: TextStyle(color: Colors.white),
+          ),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 3),
+        ),
+      );
+      return;
     }
 
     try {
@@ -235,7 +252,7 @@ class AddShoesButton extends StatelessWidget {
       DateOfShoesController.clear();
       DistanceOfShoesController.clear();
 
-      //Navigator to manage shoes page
+      // Navigator to manage shoes page
       Navigator.pushNamed(context, "/p11");
     } catch (e) {
       // Handle errors

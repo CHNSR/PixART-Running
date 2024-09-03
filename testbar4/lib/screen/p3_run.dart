@@ -5,8 +5,12 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:location/location.dart';
+import 'package:provider/provider.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
 import 'package:testbar4/database/Fire_Activity.dart';
+import 'package:testbar4/manage/manage_icon/icon_path.dart';
+import 'package:testbar4/model/provider_userData.dart';
+import 'package:testbar4/screen/layer2/selectShoes/selectShoes.dart';
 //import 'package:testbar2/model/entry.dart';
 
 class P3Run extends StatefulWidget {
@@ -17,27 +21,35 @@ class P3Run extends StatefulWidget {
 }
 
 class _RunPageState extends State<P3Run> {
+  final Activity activity = Activity();
   // for store the value about tracking
   final Set<Polyline> polyline = {};
-  final Set<Marker> _markers = {};
-  final Activity activity = Activity();
 
-  Location _location = Location();
-  late GoogleMapController _mapController;
-  LatLng _center = const LatLng(0, 0);
   List<LatLng> route = [];
 
-  double _dist = 0;
-  late String _displayTime;
-  late int _time;
-  late int _lastTime;
-  double _speed = 0;
   double _avgSpeed = 0;
-  int _speedCounter = 0;
-
-  final StopWatchTimer _stopWatchTimer = StopWatchTimer();
-  bool _isRunning = false;
+  LatLng _center = const LatLng(0, 0);
+  late String _displayTime;
+  double _dist = 0;
   bool _isMapReady = false; // Set initial to false
+  bool _isRunning = false;
+  late int _lastTime;
+  Location _location = Location();
+  late GoogleMapController _mapController;
+  final Set<Marker> _markers = {};
+  double _speed = 0;
+  int _speedCounter = 0;
+  final StopWatchTimer _stopWatchTimer = StopWatchTimer();
+  late int _time;
+  bool _isShoeSelected =false;
+  String? _selectedShoe;
+
+
+  @override
+  void dispose() async {
+    super.dispose();
+    await _stopWatchTimer.dispose(); // Need to call dispose function.
+  }
 
   @override
   void initState() {
@@ -87,12 +99,6 @@ class _RunPageState extends State<P3Run> {
         ),
       );
     });
-  }
-
-  @override
-  void dispose() async {
-    super.dispose();
-    await _stopWatchTimer.dispose(); // Need to call dispose function.
   }
 
   void _onMapCreated(GoogleMapController controller) {
@@ -171,28 +177,78 @@ class _RunPageState extends State<P3Run> {
 
   //save route and store in firebase
   void _saveRunData() async {
-    //convert route list to geo list
-    List<Map<String, dynamic>> routeData = route.map((loc) {
-      return {
-        'latitude': loc.latitude,
-        'longitude': loc.longitude,
-      };
-    }).toList();
+  // แปลงรายการเส้นทางเป็นรายการตำแหน่งทางภูมิศาสตร์
+  List<Map<String, dynamic>> routeData = route.map((loc) {
+    return {
+      'latitude': loc.latitude,
+      'longitude': loc.longitude,
+    };
+  }).toList();
 
-    // Get time in milliseconds from StopWatchTimer
-    final durationInMilliseconds = _stopWatchTimer.rawTime.value;
+  // รับเวลาในมิลลิวินาทีจาก StopWatchTimer
+  final durationInMilliseconds = _stopWatchTimer.rawTime.value;
 
-    //store data in firebase
-    Activity.addActivity(
-      distance: _dist,
-      finishdate: DateTime.now(),
-      avgPace: _speedCounter == 0 ? 0 : _avgSpeed / _speedCounter,
-      routeData: routeData,
-      time: durationInMilliseconds,
-    );
+  // บันทึกข้อมูลลงใน Firebase
+  await Activity.addActivity(
+    distance: _dist,
+    finishdate: DateTime.now(),
+    avgPace: _speedCounter == 0 ? 0 : _avgSpeed / _speedCounter,
+    routeData: routeData,
+    time: durationInMilliseconds,
+  );
 
-    print("[P3] Check call func _savedata to fire ");
+  print("[P3] ตรวจสอบการเรียกฟังก์ชัน _savedata ไปที่ Firebase");
+
+  // อัปเดตระยะทางสำหรับรองเท้าที่เลือก
+  if (_selectedShoe != null) {
+    try {
+      // รับ document ID สำหรับรองเท้าที่เลือก
+      String documentID = await _getShoeDocumentID(_selectedShoe!);
+      double newDistance = _dist / 1000; // แปลงระยะทางเป็นกิโลเมตร
+
+      // อัปเดตระยะทางใน Firestore
+      await updateDistance(documentID: documentID, newDistance: newDistance);
+
+      print('อัปเดตระยะทางเรียบร้อยแล้ว');
+    } catch (e) {
+      print('ไม่สามารถอัปเดตระยะทางได้: $e');
+    }
   }
+}
+Future<String> _getShoeDocumentID(String shoeName) async {
+  try {
+    // ดึง document ID ตามชื่อรองเท้า
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('Shoes')
+        .where('shoesName', isEqualTo: shoeName)
+        .where('runnerID', isEqualTo: context.read<UserDataPV>().userData?['id']) // ตรวจสอบว่าเป็นของผู้ใช้ปัจจุบัน
+        .limit(1)
+        .get();
+
+    if (querySnapshot.docs.isNotEmpty) {
+      return querySnapshot.docs.first.id; // คืนค่า document ID แรก
+    } else {
+      throw Exception('ไม่พบรองเท้า');
+    }
+  } catch (e) {
+    throw Exception('ไม่สามารถดึง document ID ของรองเท้าได้: $e');
+  }
+}
+
+static Future<void> updateDistance({
+  required String documentID,
+  required double newDistance,
+}) async {
+  try {
+    await firestore.collection('Shoes').doc(documentID).update({
+      'shoesRange': newDistance,
+    });
+  } catch (e) {
+    print('ไม่สามารถอัปเดตระยะทางได้: $e');
+  }
+}
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -282,34 +338,96 @@ class _RunPageState extends State<P3Run> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        IconButton(
-                          onPressed: () async {
-                            if (_isRunning) {
+                        const Spacer(),
+                        const Spacer(),
+
+                        if (_isRunning) ...[
+                          // ปุ่ม "Stop"
+                          GestureDetector(
+                            onTap: () {
                               _stopTracking();
-                            } else {
-                              _startTracking();
-                            }
-                          },
-                          icon: Icon(
-                            _isRunning ? Icons.stop : Icons.play_arrow,
-                            size: 50,
-                          ),
-                        ),
-                        if (!_isRunning)
-                          IconButton(
-                            onPressed: () {
                               print("[P3]---------Tap save data---------");
-                              //save date to firestore
+                              // save data to Firestore
                               _saveRunData();
                               Navigator.pushNamed(context, '/main');
                             },
-                            icon: const Icon(
-                              Icons.home,
-                              size: 50,
+                            child: Image.asset(
+                              IconPath().appBarIcon('finish_outline'),
+                              width: 50,
+                              height: 50,
                             ),
                           ),
+                          const Spacer(),
+                          // ปุ่ม "End"
+                          GestureDetector(
+                            onTap: () {
+                              print("[P3]---------Tap save data---------");
+                              // save data to Firestore
+                              _saveRunData();
+                              Navigator.pushNamed(context, '/main');
+                            },
+                            child: Image.asset(
+                              IconPath().appBarIcon('square_outline'),
+                              width: 40,
+                              height: 40,
+                            ),
+                          ),
+                        ] else ...[
+                          // ปุ่ม "LetsGo"
+                          GestureDetector(
+                            onTap: () {
+                              _startTracking();
+                            },
+                            child: Image.asset(
+                              IconPath().appBarIcon('letsGo_outline'),
+                              width: 60,
+                              height: 60,
+                            ),
+                          ),
+                          const Spacer(),
+                          // ปุ่ม "Square"
+                          GestureDetector(
+                            onTap: () {
+                              showModalBottomSheet(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return SelectShoes(
+                                    onSelect: (selectedShoes){
+                                      setState(() {
+                                        _selectedShoe = selectedShoes;
+                                        _isShoeSelected = true;
+                                      });
+                                     Navigator.pop(context);
+                                    },
+                                  );
+                                    
+                                },
+                              );
+                            },
+                            child: Center(
+                              child: Column(
+                                children: [
+                                  Image.asset(
+                                    _isShoeSelected
+                                        ? IconPath().appBarIcon('shoesSelection_outline') // ไอคอนใหม่เมื่อเลือกรองเท้า
+                                        : IconPath().appBarIcon('shoesSelection_select'),
+                                    width: 40,
+                                    height: 40,
+                                  ),
+                                  if (_selectedShoe != null) // แสดงชื่อรองเท้าที่เลือกใต้ไอคอน
+                                    Text(
+                                      _selectedShoe!,
+                                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w300),
+                                    ),
+                                ],
+                              ),
+                            ),
+                          ),
+
+                        ],
                       ],
                     )
+
                   ],
                 ),
               ),

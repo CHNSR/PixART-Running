@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:testbar4/main.dart';
+import 'package:provider/provider.dart';
+import 'package:testbar4/database/Fire_Activity.dart';
+import 'package:testbar4/login/p5_aftersign_inwithG.dart';
+import 'package:testbar4/model/provider_userData.dart';
 
 class MyTextField extends StatelessWidget {
   final TextEditingController controller;
@@ -56,8 +59,11 @@ class MyButton extends StatelessWidget {
         email: usernameController.text,
         password: passwordController.text,
       );
+      await Provider.of<UserDataPV>(context, listen: false).refreshUserData();
       print('Notification --->Login -- Login successfully');
-
+      
+      
+      Activity.initialize();
       /*
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Logged in successfully')),
@@ -130,8 +136,14 @@ class SigninGoogle {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Signed in as ${user.displayName}')),
         );
-        // Navigate to another screen if needed
-        Navigator.pushNamed(context, '/');
+
+        // นำทางไปที่ AdditionalInfoScreen เพื่อเก็บข้อมูลที่ขาดหายไป
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => AdditionalInfoScreen(user: user),
+          ),
+        );
       }
 
       return user;

@@ -14,6 +14,7 @@ class Shoes extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
+        shadowColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
           onPressed: () => Navigator.pushNamed(context, "/main"),
@@ -62,7 +63,7 @@ class Shoes extends StatelessWidget {
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(5),
                         color: Colors.deepOrange[200]),
-                    height: 800,
+                    height: 400,
                     width: double.maxFinite,
                     child: StreamBuilder<List<DocumentSnapshot>>(
                       stream: PixARTShoes.streamShoes(),
@@ -90,9 +91,12 @@ class Shoes extends StatelessWidget {
                             final doc = documents[index];
                             final data = doc.data() as Map<String, dynamic>;
                             final documentID = doc.id; // ดึง ID เอกสาร
+                            final double distance = data['shoesRange'];
+                            final String distanceString = distance.toStringAsFixed(2);
 
                             return Card(
                               margin: const EdgeInsets.all(10),
+                              
                               child: Row(
                                 children: [
                                   Expanded(
@@ -101,7 +105,7 @@ class Shoes extends StatelessWidget {
                                       title:
                                           Text(data['shoesName'] ?? 'Unknown'),
                                       subtitle: Text(
-                                          'Range: ${data['shoesRange'] ?? 'Unknown'}\nStart Use: ${data['startUse'] ?? 'Unknown'}'),
+                                          'Range: $distanceString Km. \nStart Use: ${data['startUse'] ?? 'Unknown'}'),
                                     ),
                                   ),
                                   IconButton(

@@ -1,6 +1,9 @@
+
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:testbar4/database/Fire_Activity.dart';
 import 'package:testbar4/login/p1_intro.dart';
 import 'package:testbar4/login/p2_login.dart';
 import 'package:testbar4/login/p3_register.dart';
@@ -17,6 +20,93 @@ import 'package:testbar4/screen/p3_run.dart';
 import 'package:testbar4/screen/p5-child/edite_profile.dart';
 import 'package:testbar4/screen/p5_profile.dart';
 import 'package:provider/provider.dart';
+/*
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(
+    MultiProvider(
+      providers: [ChangeNotifierProvider(create: (_) => UserDataPV())],
+      
+      child: const Nav(),
+    ),
+  );
+}
+class Nav extends StatelessWidget {
+  const Nav({super.key});
+  
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: AuthCheck(),
+      debugShowCheckedModeBanner: false,
+      initialRoute: '/',
+      routes: {
+        '/main': (context) => Navbar(),
+        '/p1': (context) => P1Home(),
+        '/p2': (context) => P2Location(),
+        '/p3': (context) => P3Run(),
+        '/p4': (context) => P4Forgetpass(),
+        '/p5': (context) => P5Profile(),
+        '/p6': (context) => P1Intro(),
+        '/p7': (context) => P2Login(),
+        '/p8': (context) => P3Register(),
+        '/p9': (context) => P4Forgetpass(),
+        '/p10': (context) => EditeProfile(),
+        '/p11': (context) => Shoes(),
+        '/p12': (context) => Addshoes(),
+        '/p13': (context) => ActivityPage(),
+        //'/p14': (context) => NavigationRoute(documentId: documentId)
+      },
+    );
+  }
+}
+
+
+class AuthCheck extends StatefulWidget {
+  const AuthCheck({super.key});
+
+  @override
+  _AuthCheckState createState() => _AuthCheckState();
+}
+
+class _AuthCheckState extends State<AuthCheck> {
+  bool _isInitialized = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasData) {
+          if (!_isInitialized) {
+            _initializeActivity(context).then((_) {
+              // นำทางไปยังหน้าหลักหากผู้ใช้ล็อกอินแล้ว
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                Navigator.of(context).pushReplacementNamed('/main');
+              });
+            });
+            setState(() {
+              _isInitialized = true;
+            });
+          }
+          return Container(); // ตู้คอนเทนเนอร์ว่างในขณะที่กำลังนำทาง
+        } else {
+          // นำทางไปยังหน้าต้อนรับหากผู้ใช้ยังไม่ได้ล็อกอิน
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            Navigator.of(context).pushReplacementNamed('/p6');
+          });
+          return Container(); // ตู้คอนเทนเนอร์ว่างในขณะที่กำลังนำทาง
+        }
+      },
+    );
+  }
+
+  
+}
+*/
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,6 +114,7 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [ChangeNotifierProvider(create: (_) => UserDataPV())],
+      
       child: const Nav(),
     ),
   );
@@ -31,8 +122,9 @@ void main() async {
 
 class Nav extends StatelessWidget {
   const Nav({super.key});
-
+  
   @override
+  
   Widget build(BuildContext context) {
     return MaterialApp(
       home: AuthCheck(),
@@ -67,7 +159,6 @@ class AuthCheck extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // ตรวจสอบสถานะการเข้าสู่ระบบของผู้ใช้
     return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
@@ -76,6 +167,11 @@ class AuthCheck extends StatelessWidget {
               child:
                   CircularProgressIndicator()); // รอการตรวจสอบสถานะการเข้าสู่ระบบ
         } else if (snapshot.hasData) {
+          /*// เช็คสถานะการเข้าสู่ระบบ
+          if (Activity.runnerID == null) {
+            Activity.initialize(context);
+          }
+          */
           return Navbar(); // if user is logged in
         } else {
           return P1Intro(); // if user is not logged in
@@ -84,3 +180,4 @@ class AuthCheck extends StatelessWidget {
     );
   }
 }
+

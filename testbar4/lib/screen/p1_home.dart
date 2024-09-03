@@ -109,7 +109,7 @@ class _P1HomeState extends State<P1Home> {
                             ),
                           ],
                         ),
-                        subtitle: Divider(
+                        subtitle: const Divider(
                           height: 4,
                           color: Colors.black,
                         ),
@@ -117,7 +117,9 @@ class _P1HomeState extends State<P1Home> {
                       const SizedBox(
                         height: 10,
                       ),
-                      HeatmapCP()
+                      Container(
+                        margin: const EdgeInsets.all(8.0),
+                        child: HeatmapCP())
                     ],
                   ),
                 ),
