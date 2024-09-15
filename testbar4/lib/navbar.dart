@@ -22,22 +22,55 @@ class _NavbarState extends State<Navbar> {
   Widget build(BuildContext context) {
     return Scaffold(
       //app bar
-      appBar: AppBar(
-        title: Text(
-          "PixART Running",
-          style: GoogleFonts.pixelifySans(
-              fontSize: 30, fontWeight: FontWeight.w500),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(60.0), // ขนาดของ AppBar
+        child: AppBar(
+          automaticallyImplyLeading: false, // ปิดปุ่มกลับ
+          flexibleSpace: Container(
+            decoration: const BoxDecoration(
+              /*
+              gradient: LinearGradient(
+                colors: [Color(0xFF1a2e05), Color(0xFF3f6212)], // ใส่สีของ Gradient
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
+              */
+              color: Color(0xFFf9f4ef),
+              border: Border(bottom: BorderSide(width: 3,color: Color(0xFF0f0e17)))
+            ),
+          ),
+          title: Text(
+            "PixART Running",
+            style: GoogleFonts.pixelifySans(
+              fontSize: 30,
+              fontWeight: FontWeight.w500,
+              color: Color(0xFF0f0e17),
+            ),
+          ),
+          backgroundColor: Colors.transparent, // ตั้งค่าพื้นหลังของ AppBar เป็นโปร่งใส
         ),
-        backgroundColor: const Color(0xFFF49D0C),
-        automaticallyImplyLeading: false, // ปิดปุ่มกลับ
       ),
 
       //Nav bar
-      bottomNavigationBar: SizedBox(
+      bottomNavigationBar: Container(
         height: 80,
+        decoration: BoxDecoration(
+          /*
+          gradient: LinearGradient(
+           colors: [ Color(0xFF365314),Color(0xFF3f6212)], // ใส่สีของ Gradient
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+          ),
+          */
+          color: Color(0xFFf9f4ef),
+          //borderRadius: BorderRadius.circular(10),
+          border: Border(top: BorderSide(color: Color(0xFF0f0e17),width: 3)),
+          
+        ),
         child: NavigationBar(
-          backgroundColor: const Color(0xFFfde68a),
-          indicatorColor: const Color.fromARGB(255, 255, 219, 59),
+          //backgroundColor: const Color(0xFFbef264),
+          indicatorColor: const Color(0xFFebeaf4),
+          backgroundColor: Colors.transparent,
           indicatorShape: BeveledRectangleBorder(
             borderRadius: BorderRadius.circular(5),
           ),
@@ -98,7 +131,7 @@ class _NavbarState extends State<Navbar> {
                 width: 40,
                 height: 40,
               ),
-              label: 'Plan',
+              label: 'Challenge',
             ),
             NavigationDestination(
               selectedIcon: Image.asset(

@@ -76,6 +76,18 @@ class IconPath {
     //select shoes to track running
     "shoesSelection_outline":"assets/image/icon/shoesSelection_outline.png",
     "shoesSelection_select":"assets/image/icon/shoesSelection_select.png",
+    //all marker
+    "pin_black":"assets/image/icon/pin_black.png",
+    "pin_red":"assets/image/icon/pin_red.png",
+    "pin_green":"assets/image/icon/pin_green.png",
+    //play
+    "play-button_outline":"assets/image/icon/play-button_outline.png",
+    //end
+    "the-end_outline":"assets/image/icon/the-end_outline.png",
+    //pause
+    "pause_outline":"assets/image/icon/pause_outline.png",
+    
+
     
   };
 

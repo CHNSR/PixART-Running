@@ -71,7 +71,7 @@ class ActivityPage extends StatelessWidget {
                             width: 2,
                           ),
                         ),
-                        child: CardAc(numOfCard: 'all'),
+                        child: CardAc(numOfCard: 'all',methodFetch: "fetchActivity",),
                       ),
                     ),
                   ],

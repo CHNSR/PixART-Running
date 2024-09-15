@@ -11,6 +11,7 @@ import 'package:testbar4/database/Fire_Activity.dart';
 import 'package:testbar4/manage/manage_icon/icon_path.dart';
 import 'package:testbar4/model/provider_userData.dart';
 import 'package:testbar4/screen/layer2/selectShoes/selectShoes.dart';
+
 //import 'package:testbar2/model/entry.dart';
 
 class P3Run extends StatefulWidget {
@@ -43,6 +44,7 @@ class _RunPageState extends State<P3Run> {
   late int _time;
   bool _isShoeSelected =false;
   String? _selectedShoe;
+  
 
 
   @override
@@ -106,65 +108,71 @@ class _RunPageState extends State<P3Run> {
   }
 
   void _startTracking() {
+   
     setState(() {
-      _isRunning = true;
-    });
-    _stopWatchTimer.onStartTimer();
+    _isRunning = true;
+  });
+  _stopWatchTimer.onStartTimer();
+  _location.changeSettings(interval: 500);
+  _location.onLocationChanged.listen((event) {
+    if (!_isRunning) return;
 
-    _location.onLocationChanged.listen((event) {
-      if (!_isRunning) return; // ถ้าไม่ได้กำลังจับเวลาอยู่ ให้ออกไปก่อน
+    double? latitude = event.latitude;
+    double? longitude = event.longitude;
 
-      double? latitude = event.latitude;
-      double? longitude = event.longitude;
+    if (latitude != null && longitude != null) {
+      LatLng loc = LatLng(latitude, longitude);
 
-      // ตรวจสอบว่าค่า latitude และ longitude ไม่เป็น null
-      if (latitude != null && longitude != null) {
-        LatLng loc = LatLng(latitude, longitude);
-        _mapController.animateCamera(CameraUpdate.newCameraPosition(
-            CameraPosition(target: loc, zoom: 15)));
+      _mapController.animateCamera(CameraUpdate.newCameraPosition(
+          CameraPosition(target: loc, zoom: 15)));
 
-        setState(() {
-          // อัพเดต marker
-          _markers.clear();
-          _markers.add(
-            Marker(
-              markerId: MarkerId('currentLocation'),
-              position: loc,
-              infoWindow: InfoWindow(title: 'Current Location'),
-            ),
+      setState(() {
+        _markers.clear();
+        _markers.add(
+          Marker(
+            markerId: const MarkerId('currentLocation'),
+            position: loc,
+            infoWindow: const InfoWindow(title: 'Current Location'),
+          ),
+        );
+
+        if (route.isNotEmpty) {
+          double appendDist = Geolocator.distanceBetween(
+            route.last.latitude,
+            route.last.longitude,
+            loc.latitude,
+            loc.longitude,
           );
+          _dist += appendDist;
 
-          if (route.isNotEmpty) {
-            double appendDist = Geolocator.distanceBetween(route.last.latitude,
-                route.last.longitude, loc.latitude, loc.longitude);
-            _dist = _dist + appendDist;
-            int timeDuration = (_time - _lastTime);
-
-            if (timeDuration != 0) {
-              _speed = (appendDist / (timeDuration / 1000)) * 3.6;
-              if (_speed != 0) {
-                _avgSpeed = _avgSpeed + _speed;
-                _speedCounter++;
-              }
+          int timeDuration = (_time - _lastTime);
+          if (timeDuration != 0) {
+            _speed = (appendDist / (timeDuration / 1000)) * 3.6;
+            if (_speed != 0) {
+              _avgSpeed += _speed;
+              _speedCounter++;
             }
           }
-          _lastTime = _time;
-          route.add(loc);
+        }
 
-          polyline.add(Polyline(
-              polylineId: PolylineId(event.toString()),
-              visible: true,
-              points: route,
-              width: 5,
-              startCap: Cap.roundCap,
-              endCap: Cap.roundCap,
-              color: Colors.deepOrange));
-        });
-      } else {
-        // จัดการกรณีที่ latitude หรือ longitude เป็น null
-        print("Error: latitude or longitude is null.");
-      }
-    });
+        _lastTime = _time;
+        route.add(loc);
+
+        polyline.clear();
+        polyline.add(
+          Polyline(
+            polylineId: const PolylineId('currentRoute'),
+            points: route,
+            width: 5,
+            startCap: Cap.roundCap,
+            endCap: Cap.roundCap,
+            color: Colors.deepOrange,
+          ),
+        );
+      });
+    }
+  });
+
   }
 
   void _stopTracking() {
@@ -187,6 +195,7 @@ class _RunPageState extends State<P3Run> {
 
   // รับเวลาในมิลลิวินาทีจาก StopWatchTimer
   final durationInMilliseconds = _stopWatchTimer.rawTime.value;
+  print('[P3][check data]Duration in milliseconds: $durationInMilliseconds'); 
 
   // บันทึกข้อมูลลงใน Firebase
   await Activity.addActivity(
@@ -304,19 +313,32 @@ static Future<void> updateDistance({
                               stream: _stopWatchTimer.rawTime,
                               initialData: 0,
                               builder: (context, snap) {
-                                _time = snap.data!;
-                                _displayTime = StopWatchTimer
-                                        .getDisplayTimeHours(_time) +
-                                    ":" +
-                                    StopWatchTimer.getDisplayTimeMinute(_time) +
-                                    ":" +
-                                    StopWatchTimer.getDisplayTimeSecond(_time);
-                                return Text(_displayTime,
+                                if (snap.hasData) {
+                                  _time = snap.data!;
+                                  _displayTime = StopWatchTimer.getDisplayTimeHours(_time) +
+                                      ":" +
+                                      StopWatchTimer.getDisplayTimeMinute(_time) +
+                                      ":" +
+                                      StopWatchTimer.getDisplayTimeSecond(_time);
+                                  return Text(
+                                    _displayTime,
                                     style: GoogleFonts.montserrat(
-                                        fontSize: 30,
-                                        fontWeight: FontWeight.w300));
+                                      fontSize: 30,
+                                      fontWeight: FontWeight.w300,
+                                    ),
+                                  );
+                                } else {
+                                  return Text(
+                                    '00:00:00',
+                                    style: GoogleFonts.montserrat(
+                                      fontSize: 30,
+                                      fontWeight: FontWeight.w300,
+                                    ),
+                                  );
+                                }
                               },
                             )
+
                           ],
                         ),
                         Column(

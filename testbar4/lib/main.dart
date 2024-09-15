@@ -11,6 +11,8 @@ import 'package:testbar4/login/p4_forgetpass.dart';
 import 'package:testbar4/model/provider_userData.dart';
 import 'package:testbar4/navbar.dart';
 import 'package:testbar4/screen/layer2/activity/activity.dart';
+import 'package:testbar4/screen/layer2/activity/componente/activityCP.dart';
+import 'package:testbar4/screen/layer2/location/component/addlocation.dart';
 import 'package:testbar4/screen/layer2/location/navigation.dart';
 import 'package:testbar4/screen/layer2/shose/addshoes.dart';
 import 'package:testbar4/screen/layer2/shose/shoes.dart';
@@ -20,93 +22,6 @@ import 'package:testbar4/screen/p3_run.dart';
 import 'package:testbar4/screen/p5-child/edite_profile.dart';
 import 'package:testbar4/screen/p5_profile.dart';
 import 'package:provider/provider.dart';
-/*
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-  runApp(
-    MultiProvider(
-      providers: [ChangeNotifierProvider(create: (_) => UserDataPV())],
-      
-      child: const Nav(),
-    ),
-  );
-}
-class Nav extends StatelessWidget {
-  const Nav({super.key});
-  
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: AuthCheck(),
-      debugShowCheckedModeBanner: false,
-      initialRoute: '/',
-      routes: {
-        '/main': (context) => Navbar(),
-        '/p1': (context) => P1Home(),
-        '/p2': (context) => P2Location(),
-        '/p3': (context) => P3Run(),
-        '/p4': (context) => P4Forgetpass(),
-        '/p5': (context) => P5Profile(),
-        '/p6': (context) => P1Intro(),
-        '/p7': (context) => P2Login(),
-        '/p8': (context) => P3Register(),
-        '/p9': (context) => P4Forgetpass(),
-        '/p10': (context) => EditeProfile(),
-        '/p11': (context) => Shoes(),
-        '/p12': (context) => Addshoes(),
-        '/p13': (context) => ActivityPage(),
-        //'/p14': (context) => NavigationRoute(documentId: documentId)
-      },
-    );
-  }
-}
-
-
-class AuthCheck extends StatefulWidget {
-  const AuthCheck({super.key});
-
-  @override
-  _AuthCheckState createState() => _AuthCheckState();
-}
-
-class _AuthCheckState extends State<AuthCheck> {
-  bool _isInitialized = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return StreamBuilder<User?>(
-      stream: FirebaseAuth.instance.authStateChanges(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasData) {
-          if (!_isInitialized) {
-            _initializeActivity(context).then((_) {
-              // นำทางไปยังหน้าหลักหากผู้ใช้ล็อกอินแล้ว
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                Navigator.of(context).pushReplacementNamed('/main');
-              });
-            });
-            setState(() {
-              _isInitialized = true;
-            });
-          }
-          return Container(); // ตู้คอนเทนเนอร์ว่างในขณะที่กำลังนำทาง
-        } else {
-          // นำทางไปยังหน้าต้อนรับหากผู้ใช้ยังไม่ได้ล็อกอิน
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            Navigator.of(context).pushReplacementNamed('/p6');
-          });
-          return Container(); // ตู้คอนเทนเนอร์ว่างในขณะที่กำลังนำทาง
-        }
-      },
-    );
-  }
-
-  
-}
-*/
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -147,6 +62,7 @@ class Nav extends StatelessWidget {
         '/p11': (context) => Shoes(),
         '/p12': (context) => Addshoes(),
         '/p13': (context) => ActivityPage(),
+        '/p14': (context) => AddLocationPage(),
         //'/p14': (context) => NavigationRoute(documentId: documentId)
       },
     );

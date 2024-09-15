@@ -130,7 +130,7 @@ class _P5ProfileState extends State<P5Profile> {
       print("[P5]-------------------------${userData}------------------");
       final name = userData?['name'] ?? 'error';
       return Scaffold(
-        backgroundColor: const Color(0xFFFFFEEA),
+        backgroundColor: const Color(0xFFf9f4ef),
         body: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(10),
@@ -150,7 +150,7 @@ class _P5ProfileState extends State<P5Profile> {
                   child: CircleAvatar(
                     radius: 50,
                     backgroundImage: NetworkImage(
-                        'https://via.placeholder.com/150'), // URL รูปโปรไฟล์
+                        'https://www.flaticon.com/free-icons/pixel'), // URL รูปโปรไฟล์
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -241,8 +241,13 @@ class _P5ProfileState extends State<P5Profile> {
                     width: 400,
                     //height: 400,
                     decoration: BoxDecoration(
-                        color: Colors.deepOrange[100],
-                        borderRadius: BorderRadius.circular(5)),
+                      color: Color(0xFFeaddcf),
+                      borderRadius: BorderRadius.circular(5),
+                      border: Border.all(width: 2,
+                        color: Colors.black
+                      )  
+                    ),
+                        
                     child: Column(
                       children: [
                         const ListTile(
@@ -298,8 +303,11 @@ class _P5ProfileState extends State<P5Profile> {
                   height: 450,
                   child: DecoratedBox(
                     decoration: BoxDecoration(
-                      color: Colors.deepOrange[100],
+                      color: Color(0xFFeaddcf),
                       borderRadius: BorderRadius.circular(5),
+                      border: Border.all(width: 2,
+                        color: Colors.black
+                      )  
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start, // จัดแนวลูก widget ไปที่จุดเริ่มต้น
@@ -323,7 +331,7 @@ class _P5ProfileState extends State<P5Profile> {
                             result: distance ?? '0.0', // ให้ค่าเริ่มต้น
                             unit: 'KM',
                             datetime: distancedate ?? 'Loading...', // ให้ค่าเริ่มต้น
-                            trailingColor: Colors.green,
+                            trailingColor: Color(0xFF0c4a6e),
                           ),
                         ),
                         // ความเร็วที่ดีที่สุด
@@ -334,7 +342,7 @@ class _P5ProfileState extends State<P5Profile> {
                             result: bestAVGpace ?? '0.0', // ให้ค่าเริ่มต้น
                             unit: 'Pace',
                             datetime: bestAVGpacedate ?? 'Loading...', // ให้ค่าเริ่มต้น
-                            trailingColor: Colors.green,
+                            trailingColor: Color(0xFFf25042),
                           ),
                         ),
                         // ระยะเวลาที่ยาวที่สุด
@@ -345,7 +353,7 @@ class _P5ProfileState extends State<P5Profile> {
                             result: bestDuration ?? '0.0', // ให้ค่าเริ่มต้น
                             unit: "Hour",
                             datetime: bestDurationdate ?? 'Loading...', // ให้ค่าเริ่มต้น
-                            trailingColor: Colors.green,
+                            trailingColor: Color(0xFF8c7851),
                           ),
                         ),
                       ],
@@ -363,8 +371,11 @@ class _P5ProfileState extends State<P5Profile> {
                     width: 400,
                     height: 650,
                     decoration: BoxDecoration(
-                        color: Colors.deepOrange[100],
-                        borderRadius: BorderRadius.circular(5)
+                      color: Color(0xFFeaddcf),
+                      borderRadius: BorderRadius.circular(5),
+                      border: Border.all(width: 2,
+                        color: Colors.black
+                      )  
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -386,44 +397,44 @@ class _P5ProfileState extends State<P5Profile> {
                           imgName: 'best_outline',
                           title: 'BEST 400M',
                           distanceM: 400,
-                          trailingColor: Colors.red,
+                          trailingColor: Color(0xFF0c4a6e),
                         ),
                         //call card func
                         cardWidget(
                           imgName: 'best_outline',
                           title: 'BEST 1K',
                           distanceM: 1000,
-                          trailingColor: Colors.green,
+                          trailingColor: Color(0xFF0c4a6e),
                         ),
                         cardWidget(
                           imgName: 'best_outline',
                           title: 'BEST 2K',
                           distanceM: 2000,
-                          trailingColor: Colors.green,
+                          trailingColor: Color(0xFF0c4a6e),
                         ),
                         cardWidget(
                           imgName: 'best_outline',
                           title: 'BEST 5K',
                           distanceM: 5000,
-                          trailingColor: Colors.green,
+                          trailingColor: Color(0xFF0c4a6e),
                         ),
                         cardWidget(
                           imgName: 'best_outline',
                           title: 'BEST 10K',
                           distanceM: 10000,
-                          trailingColor: Colors.green,
+                          trailingColor: Color(0xFF0c4a6e),
                         ),
                         cardWidget(
                           imgName: 'best_outline',
                           title: 'BEST 21K',
                           distanceM: 21000,
-                          trailingColor: Colors.green,
+                          trailingColor: Color(0xFF0c4a6e),
                         ),
                         cardWidget(
                           imgName: 'best_outline',
                           title: 'BEST 42K',
                           distanceM: 42000,
-                          trailingColor: Colors.green,
+                          trailingColor: Color(0xFF0c4a6e),
                         ),
                       ],
                     ),
@@ -552,10 +563,11 @@ class _P5ProfileState extends State<P5Profile> {
                 padding: const EdgeInsets.fromLTRB(24, 0, 0, 3),
                 child: Text(
                   "$result $unit",
-                  style: const TextStyle(
+                  style:  TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
-                      color: Colors.green),
+                      color: trailingColor
+                    ),
                 ),
               )),
               Expanded(

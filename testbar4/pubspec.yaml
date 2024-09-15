@@ -54,6 +54,9 @@ dependencies:
   flutter_heatmap_calendar: ^1.0.5
   flutter_launcher_icons: ^0.13.1
   flutter_card_swiper: ^7.0.1
+  flutter_image_compress: ^2.3.0
+  syncfusion_flutter_gauges: ^26.2.14
+  flex_color_picker: ^3.5.1
 
 dev_dependencies:
   flutter_test:
@@ -110,5 +113,12 @@ flutter:
   #       - asset: fonts/TrajanPro_Bold.ttf
   #         weight: 700
   #
+  
+  fonts:
+      - family: Jersey25
+        fonts:
+          - asset: assets/fonts/Jersey25.ttf
+
+
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages

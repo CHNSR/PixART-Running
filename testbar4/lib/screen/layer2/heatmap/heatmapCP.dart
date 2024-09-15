@@ -11,6 +11,7 @@ class HeatmapCP extends StatefulWidget {
 
 class _HeatmapCPState extends State<HeatmapCP> {
   Map<DateTime, int> datasets = {};
+  double totalDistance = 0.0; // ตัวแปรสำหรับเก็บระยะทางรวมของวันนั้น
 
   @override
   void initState() {
@@ -43,6 +44,27 @@ class _HeatmapCPState extends State<HeatmapCP> {
     }
   }
 
+  Future<void> loadTotalDistanceForDate(DateTime date) async {
+  try {
+    final data = await Activity.fetchActivityByDate(date); // สมมติว่าคุณมีฟังก์ชันนี้เพื่อดึงข้อมูลเฉพาะวัน
+    double distanceSumMeters = 0.0;
+
+    for (var activity in data) {
+      distanceSumMeters += activity['distance']; // สมมติว่า field ระยะทางใน activity คือ 'distance'
+    }
+
+    double distanceSumKm = distanceSumMeters / 1000.0; // แปลงเป็นกิโลเมตร
+
+    setState(() {
+      totalDistance = distanceSumKm;
+      print("[P1][HeatMap] distance on this day: $totalDistance km");
+    });
+  } catch (e) {
+    print("Error loading total distance: $e");
+  }
+}
+
+
   @override
   Widget build(BuildContext context) {
     // Get the first and last days of the current month
@@ -54,21 +76,33 @@ class _HeatmapCPState extends State<HeatmapCP> {
         '[P1][Chart][ChartComPo]-----print start day in chart: $firstDayOfMonth');
     print(
         '[P1][Chart][ChartComPo]-----print end day in chart: $lastDayOfMonth');
-    return HeatMapCalendar(
-      datasets: datasets,
-      colorMode: ColorMode.opacity,
-      colorsets: const {
-        1: Colors.red,
-        3: Colors.orange,
-        5: Colors.yellow,
-        7: Colors.green,
-        9: Colors.blue,
-        11: Colors.indigo,
-        13: Colors.purple,
-      },
-      size: 40,
-      flexible: true,
-      weekTextColor: Colors.black,
+    return Column(
+      children: [
+        HeatMapCalendar(
+          datasets: datasets,
+          colorMode: ColorMode.opacity,
+          colorsets: const {
+            1: Colors.red,
+            2: Colors.orange,
+            3: Colors.yellow,
+            4: Colors.green,
+            5: Colors.blue,
+            6: Colors.indigo,
+            7: Colors.purple,
+          },
+          size: 40,
+          flexible: true,
+          weekTextColor: Colors.black,
+          onClick: (date) {
+            loadTotalDistanceForDate(date); // เมื่อกดที่วันที่จะเรียกฟังก์ชันนี้เพื่อโหลดระยะทาง
+          },
+        ),
+        const SizedBox(height: 20),
+        Text(
+          "Total km on this day: ${totalDistance.toStringAsFixed(2)} km", // แสดงระยะทางรวมของวันนั้น
+          style: const TextStyle(fontSize: 18),
+        ),
+      ],
     );
   }
 }

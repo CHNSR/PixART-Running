@@ -9,6 +9,7 @@ import 'package:testbar4/database/Fire_Activity.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:testbar4/database/Fire_Location.dart';
 import 'package:testbar4/manage/manage_icon/icon_path.dart';
+import 'package:syncfusion_flutter_gauges/gauges.dart';
 
 class ActivityMap extends StatefulWidget {
   const ActivityMap({super.key, required this.activities});
@@ -94,9 +95,11 @@ class _ActivityMapState extends State<ActivityMap> {
 //class card to show data form activities
 //can select number of card ex. show card 3 or show all card
 class CardAc extends StatefulWidget {
-  const CardAc({super.key, required this.numOfCard});
+  const CardAc({super.key, required this.numOfCard, this.startDate, this.endDate, required this.methodFetch });
 
   final dynamic numOfCard;
+  final DateTime? startDate,endDate;
+  final String methodFetch;
 
   @override
   State<CardAc> createState() => _CardAcState();
@@ -128,8 +131,19 @@ class _CardAcState extends State<CardAc> {
     super.initState();
     //call initialize to get user id form provider and use it to fetch data
     Activity.initialize();
-    _activitiesFuture = Activity.fetchActivity(numOfFetch: widget.numOfCard)
+    if (widget.methodFetch == "fetchActivity") {
+      _activitiesFuture = Activity.fetchActivity(numOfFetch: widget.numOfCard)
         as Future<List<Map<String, dynamic>>>?;
+        
+    }else if(widget.methodFetch == "fetchActivityDateTime"){
+      _activitiesFuture = Activity.fetchActivityDateTime(numOfFetch: widget.numOfCard, startDate: widget.startDate, endDate: widget.endDate)
+      as Future<List<Map<String, dynamic>>>?;
+      
+    }else{
+      _activitiesFuture = null;
+    }
+    print("[CardAC][check method] (${widget.methodFetch}) value :$_activitiesFuture");
+    
   }
 
   @override
@@ -161,19 +175,20 @@ class _CardAcState extends State<CardAc> {
                   convertMetresToKilometres(distanceInMetres);
 
               final pace = (activity['AVGpace'] as double).toStringAsFixed(2);
-              final timeInSeconds = activity['time'] as int;
+              final timeInMilliseconds = activity['time'] as int;
+              final timeInSeconds = (timeInMilliseconds / 1000).round();
               final time = _formatDuration(timeInSeconds);
 
               final date =
                   DateFormat('yyyy-MM-dd HH:mm:ss').format(activity['date']);
 
               return Card(
-                color: Color.fromARGB(255, 255, 247, 134),
+                color: Colors.white,
                 margin: const EdgeInsets.all(8),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(5),
                   side: const BorderSide(
-                    color: Colors.grey,
+                    color: Colors.black,
                     width: 1,
                   ),
                 ),
@@ -199,7 +214,7 @@ class _CardAcState extends State<CardAc> {
                             style: const TextStyle(fontSize: 18),
                           ),
                           Text(
-                            "Time: ${time} min",
+                            "Time: ${time} sec",
                             style: const TextStyle(fontSize: 18),
                           ),
                           Text(
@@ -207,6 +222,7 @@ class _CardAcState extends State<CardAc> {
                             style: const TextStyle(fontSize: 18),
                           ),
                           const SizedBox(height: 5),
+                          /*
                           Row(
                             children: [
                               const Expanded(
@@ -234,6 +250,7 @@ class _CardAcState extends State<CardAc> {
                               ),
                             ],
                           ),
+                          */
                         ],
                       ),
                     ),
@@ -247,6 +264,7 @@ class _CardAcState extends State<CardAc> {
     );
   }
 }
+
 
 class AddLocationButton extends StatelessWidget {
   final String type;
@@ -275,5 +293,19 @@ class AddLocationButton extends StatelessWidget {
             height: 20,
           ));
     }
+  }
+}
+
+class RangeMiter extends StatefulWidget {
+  const RangeMiter({super.key});
+
+  @override
+  State<RangeMiter> createState() => _RangeMiterState();
+}
+
+class _RangeMiterState extends State<RangeMiter> {
+  @override
+  Widget build(BuildContext context) {
+    return const Placeholder();
   }
 }

@@ -18,7 +18,7 @@ class _P1HomeState extends State<P1Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFFEEA),
+      backgroundColor: const Color(0xFFfffffe),
       body: SingleChildScrollView(
         child: Center(
           child: Padding(
@@ -34,10 +34,10 @@ class _P1HomeState extends State<P1Home> {
                   width: double.infinity,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
-                    color: const Color(0xFFfef3c7),
+                    color: const Color(0xFFeaddcf),
                     border: Border.all(
-                      color: Colors.grey,
-                      width: 2,
+                      color: Colors.black,
+                      width: 3,
                     ),
                   ),
                   child: Column(
@@ -70,6 +70,7 @@ class _P1HomeState extends State<P1Home> {
                       ),
                       const CardAc(
                         numOfCard: 3,
+                        methodFetch:"fetchActivity",
                       ),
                     ],
                   ),
@@ -80,10 +81,10 @@ class _P1HomeState extends State<P1Home> {
                   width: double.infinity,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
-                    color: const Color(0xFFfef3c7),
+                    color: const Color(0xFFeaddcf),
                     border: Border.all(
-                      color: Colors.grey,
-                      width: 2,
+                      color: Colors.black,
+                      width: 3,
                     ),
                   ),
                   child: Column(

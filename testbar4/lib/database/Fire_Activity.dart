@@ -2,11 +2,11 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
+//import 'package:flutter/material.dart';
+//import 'package:firebase_core/firebase_core.dart';
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
-import 'package:testbar4/model/provider_userData.dart';
+//import 'package:provider/provider.dart';
+//import 'package:testbar4/model/provider_userData.dart';
 
 // Firestore & Auth
 final firestore = FirebaseFirestore.instance;
@@ -118,6 +118,58 @@ class Activity {
     }
   }
 
+ 
+  
+  // Fetch activity data with DateTime range
+  static Future<List<Map<String, dynamic>>> fetchActivityDateTime({
+    required dynamic numOfFetch,
+    DateTime? startDate,
+    DateTime? endDate,
+  }) async {
+    if (runnerID == null) {
+      throw Exception("Runner ID not initialized.");
+    }
+
+    try {
+      Query query = firestore.collection("Activity").where('runnerID', isEqualTo: runnerID);
+
+      // If both startDate and endDate are provided, apply date filtering
+      if (startDate != null && endDate != null) {
+        query = query
+            .where('date', isGreaterThanOrEqualTo: startDate)
+            .where('date', isLessThanOrEqualTo: endDate);
+      }
+
+      // Order by date in descending order
+      query = query.orderBy('date', descending: true);
+
+      // Apply limit if numOfFetch is not 'all'
+      if (numOfFetch != 'all') {
+        query = query.limit(numOfFetch);
+      }
+
+      // Execute the query and fetch the snapshot
+      QuerySnapshot snapshot = await query.get();
+
+      // Map the snapshot data
+      return snapshot.docs.map((doc) {
+        final data = doc.data() as Map<String, dynamic>;
+
+        // Convert Timestamp to DateTime
+        if (data['date'] is Timestamp) {
+          data['date'] = (data['date'] as Timestamp).toDate();
+        }
+
+        return data;
+      }).toList();
+    } catch (e) {
+      throw Exception("Error fetching activity: $e");
+    }
+  }
+
+
+
+
   // Fetch best time
   static Future<Map<String, dynamic>?> fetchBestTime(int distance) async {
     if (runnerID == null) {
@@ -209,12 +261,13 @@ class Activity {
 
     try {
       final snapshot = await firestore
-          .collection("Activity")
-          .where('runnerID', isEqualTo: runnerID)
-          .where('distance', isGreaterThan: 1.0)
-          .orderBy('AVGpace')
-          .limit(1)
-          .get();
+        .collection("Activity")
+        .where('runnerID', isEqualTo: runnerID)
+        .where('distance', isGreaterThan: 1.0)
+        .where('AVGpace', isGreaterThan: 1.00) // เพิ่มเงื่อนไข pace > 1.00
+        .orderBy('AVGpace')
+        .limit(1)
+        .get();
 
       if (snapshot.docs.isEmpty) {
         return null;
@@ -227,7 +280,7 @@ class Activity {
         'date': DateFormat('yyyy-MM-dd HH:mm:ss').format((data['date'] as Timestamp).toDate()),
         'AVGpace': (data['AVGpace'] as double).toStringAsFixed(2),
       };
-
+      print("[Fire-Activity][fetchBestPace] Check data --------> : $data");
       print("[Fire-Activity][fetchBestPace] --------> : $result");
       return result;
     } catch (e) {
@@ -297,6 +350,36 @@ class Activity {
       return totalDistance;
     } catch (e) {
       print("[Fire_Activity][fetchTotalDistance]----Error---> : $e");
+      return 0.0;
+    }
+  }
+
+
+  // Fetch total distance within a date range
+  static Future<double> fetchTotalDistanceSE(DateTime startDate, DateTime endDate) async {
+    if (runnerID == null) {
+      throw Exception("Runner ID not initialized.");
+    }
+
+    double totalDistance = 0.0;
+
+    try {
+      final snapshot = await firestore
+          .collection("Activity")
+          .where('runnerID', isEqualTo: runnerID)
+          .where('date', isGreaterThanOrEqualTo: startDate)
+          .where('date', isLessThanOrEqualTo: endDate)
+          .get();
+
+      for (var doc in snapshot.docs) {
+        final data = doc.data() as Map<String, dynamic>;
+        totalDistance += data['distance'] as double;
+      }
+
+      print("[Fire-Activity][fetchTotalDistanceSE][ Start date: $startDate ,End date: $endDate] --------> Total Distance: $totalDistance");
+      return totalDistance;
+    } catch (e) {
+      print("[Fire_Activity][fetchTotalDistanceSE]----Error---> : $e");
       return 0.0;
     }
   }
@@ -397,4 +480,37 @@ class Activity {
       return 0.0;
     }
   }
+  //fetch by date
+  static Future<List<Map<String, dynamic>>> fetchActivityByDate(DateTime date) async {
+    if (auth.currentUser == null) {
+      print("[Fire Activity][fetchActivityByDate]------Error: No user logged in.");
+      return [];
+    }
+
+    try {
+      // Normalize the date to start of the day
+      DateTime startOfDay = DateTime(date.year, date.month, date.day);
+      DateTime endOfDay = startOfDay.add(const Duration(days: 1));
+
+      QuerySnapshot querySnapshot = await firestore
+          .collection("Activity")
+          .where("runnerID", isEqualTo: runnerID)
+          .where("date", isGreaterThanOrEqualTo: Timestamp.fromDate(startOfDay))
+          .where("date", isLessThan: Timestamp.fromDate(endOfDay))
+          .get();
+
+      List<Map<String, dynamic>> activityList = [];
+
+      for (var doc in querySnapshot.docs) {
+        activityList.add(doc.data() as Map<String, dynamic>);
+      }
+
+      print("[Fire Activity][fetchActivityByDate]------Fetched activities: $activityList");
+      return activityList;
+    } catch (e) {
+      print("[Fire Activity][fetchActivityByDate]------Error fetching activity by date: $e");
+      return [];
+    }
+  }
+
 }

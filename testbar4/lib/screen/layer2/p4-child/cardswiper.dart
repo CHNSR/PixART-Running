@@ -1,16 +1,38 @@
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
-import 'package:testbar4/database/Fire_Challenge.dart';
+import 'package:provider/provider.dart';
+import 'package:testbar4/database/Fire_UserChallenge.dart';
+import 'package:testbar4/model/provider_userData.dart';
 
 class CardswiperCP extends StatefulWidget {
-  const CardswiperCP({super.key});
+  final Function(Map<String, dynamic>) onChallengeSelected;
+  final Map<String, String> challengeStatuses;
+
+  const CardswiperCP({super.key, required this.onChallengeSelected, required this.challengeStatuses});
 
   @override
-  State<CardswiperCP> createState() => _CardswiperCPState();
+  State<CardswiperCP> createState() => CardswiperCPState();
 }
 
-class _CardswiperCPState extends State<CardswiperCP> {
+class CardswiperCPState extends State<CardswiperCP> {
+  int selectedIndex = 0; // เริ่มต้นไม่มีการ์ดถูกเลือก
+  late CardSwiperController swiperController;
+  int pickChallenge = -1;
+
+  @override
+  void initState() {
+    super.initState();
+    swiperController = CardSwiperController();
+  }
+
+  // Function to convert a hex string back to a Color
+  Color hexToColor(String hexString) {
+    return Color(int.parse(hexString.replaceFirst('#', '0x')));
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
@@ -23,81 +45,134 @@ class _CardswiperCPState extends State<CardswiperCP> {
         } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
           return const Center(child: Text('No challenges found.'));
         } else {
-          // Create cards from the fetched challenges
-          List<Container> cards = snapshot.data!.docs.map((doc) {
-            final challenge = doc.data() as Map<String, dynamic>;
-            return Container(
-              height: 200,
-              width: 200,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: Colors.blueAccent,
-                borderRadius: BorderRadius.circular(5),
-                border: Border.all(width: 2, color: Colors.black),
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // Top container with 80% height
-                  Expanded(
-                    flex: 8, // This is 80% of the total height (8 out of 10)
-                    child: Container(
-                      alignment: Alignment.center,
-                      child: Text(
-                        challenge['name'] ?? 'No name', // Display the challenge name
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-                  // Footer container with 20% height
-                  Expanded(
-                    flex: 2, // This is 20% of the total height (2 out of 10)
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white
-                      ),
-                      alignment: Alignment.center,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            'Expend: ${challenge['expend']} ',
-                            style: const TextStyle(fontSize: 16, color: Colors.black),
-                          ),
-                          Text(
-                            'Distance: ${challenge['distance']} meters',
-                            style: const TextStyle(fontSize: 16, color: Colors.black),
-                          ),
-                          Text(
-                            'Start Date: ${challenge['start_date'].toDate()}',
-                            style: const TextStyle(fontSize: 14, color: Colors.black),
-                          ),
-                          Text(
-                            'End Date: ${challenge['end_date'].toDate()}',
-                            style: const TextStyle(fontSize: 14, color: Colors.black),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            );
+          List<Map<String, dynamic>> challenges = snapshot.data!.docs.map((doc) {
+            final data = doc.data() as Map<String, dynamic>;
+            final challengeId = doc.id;
+            return {...data, 'challengeId': challengeId};
           }).toList();
 
           return SizedBox(
-            height: 200, // Ensure there is enough height for the CardSwiper
+            height: 200,
             child: CardSwiper(
-              cardBuilder: (context, index, percentThresholdX, percentThresholdY) => cards[index],
-              cardsCount: cards.length,
+              controller: swiperController,
+              initialIndex: selectedIndex >= 0 ? selectedIndex : 0, // ถ้า selectedIndex มีค่ามากกว่า 0 ก็จะเริ่มต้นด้วย index นั้น
+              cardBuilder: (context, index, percentThresholdX, percentThresholdY) {
+                final challenge = challenges[index];
+                final challengeId = challenge['challengeId'];
+                final status = widget.challengeStatuses[challengeId] ?? 'Unknown';
+
+                return GestureDetector(
+                  onDoubleTap: () {
+                    setState(() {
+                      if (pickChallenge == index) {
+                        pickChallenge = -1; // ยกเลิกการเลือกถ้ากดซ้ำการ์ดที่เลือกแล้ว
+                      } else {
+                        pickChallenge = index; //  select new card
+                        selectedIndex = index; // update selectIndex
+                      }
+                    });
+                    widget.onChallengeSelected(challenge);
+                  },
+                  child: _buildChallengeCard(challenge, status, index == pickChallenge ),
+                );
+              },
+              cardsCount: challenges.length,
             ),
           );
         }
       },
+    );
+  }
+
+  Widget _buildChallengeCard(Map<String, dynamic> challenge, String status, bool isSelected) {
+    Color statusColor;
+
+    switch (status) {
+      case 'Unknown':
+        statusColor = Colors.yellow;
+        break;
+      case 'in progress':
+        statusColor = Colors.blue;
+        break;
+      case 'passed':
+        statusColor = Colors.green;
+        break;
+      default:
+        statusColor = Colors.red;
+    }
+
+    return Container(
+      height: 250,
+      width: 200,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: challenge['color'] != null ? hexToColor(challenge['color']) : Colors.blue,
+        borderRadius: BorderRadius.circular(5),
+        border: Border.all(width: 2, color: Colors.black),
+      ),
+      child: Stack(
+        children: [
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Expanded(
+                flex: 8,
+                child: Container(
+                  alignment: Alignment.center,
+                  child: Text(
+                    challenge['name'] ?? 'No name',
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+              Expanded(
+                flex: 2,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                  ),
+                  alignment: Alignment.center,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Expend: ${challenge['expend']}',
+                        style: const TextStyle(fontSize: 16, color: Colors.black),
+                      ),
+                      Text(
+                        'Distance: ${challenge['distance']} meters',
+                        style: const TextStyle(fontSize: 16, color: Colors.black),
+                      ),
+                      Text(
+                        'Start Date: ${challenge['start_date'].toDate()}',
+                        style: const TextStyle(fontSize: 14, color: Colors.black),
+                      ),
+                      Text(
+                        'End Date: ${challenge['end_date'].toDate()}',
+                        style: const TextStyle(fontSize: 14, color: Colors.black),
+                      ),
+                      Text(
+                        'Status: $status',
+                        style: TextStyle(fontSize: 14, color: statusColor),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          if (isSelected)
+            Positioned(
+              top: 10,
+              right: 10,
+              child: Icon(Icons.check_circle, color: Colors.green, size: 30),
+            ),
+        ],
+      ),
     );
   }
 }

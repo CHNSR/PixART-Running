@@ -17,7 +17,8 @@ class UserDataPV extends ChangeNotifier {
   // เริ่มต้นข้อมูลผู้ใช้และตรวจสอบสถานะผู้ดูแล
   Future<void> _initializeUserData() async {
     await _fetchUserData(); // ดึงข้อมูลผู้ใช้ก่อน
-    _checkAdminStatus(); // ตรวจสอบว่าผู้ใช้เป็นผู้ดูแลหรือไม่ตามข้อมูลที่ดึงมา
+    _checkAdminStatus();
+    print("[Provider] Userdata :$userData"); // ตรวจสอบว่าผู้ใช้เป็นผู้ดูแลหรือไม่ตามข้อมูลที่ดึงมา
   }
 
   // ดึงข้อมูลผู้ใช้จาก Firestore

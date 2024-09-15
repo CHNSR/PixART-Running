@@ -42,11 +42,15 @@ class CardLocation extends StatelessWidget {
           return const Center(child: Text('No data found'));
         }
 
-        final data = snapshot.data!;
-        final name = data['name'] ?? 'Unknown';
-        final distance = data['distance']?.toString() ?? 'Unknown';
-        final route = data['route'] as List<dynamic>?;
-        final status = data["private"] == true ? "private" : "plublic";
+      final data = snapshot.data!;
+      final name = data['name'] ?? 'Unknown';
+      final distanceInMeters = data['distance'] ?? 0.0;
+      final distanceInKilometers = (distanceInMeters / 1000).toStringAsFixed(2);
+      final route = data['route'] as List<dynamic>?;
+      final status = data["private"] == true ? "private" : "public";
+
+// Rest of your code...
+
         // Cast to List<dynamic>
 
         if (route != null) {
@@ -57,12 +61,16 @@ class CardLocation extends StatelessWidget {
 
           print("[P2][Card] Check route before send to ShowMap(): $routeList");
 
-          return Card(
-            elevation: 4,
-            margin: const EdgeInsets.symmetric(vertical: 8.0),
-            shape: RoundedRectangleBorder(
+          return Container(
+            
+            decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(15.0),
+              border: Border.all(width: 2.0,color: Colors.black),
+              color: Colors.white,
+
+
             ),
+            
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
@@ -99,7 +107,7 @@ class CardLocation extends StatelessWidget {
                                     ),
                                     Align(
                                         alignment: Alignment.centerLeft,
-                                        child: Text('Distance: $distance km')),
+                                        child: Text('Distance: $distanceInKilometers km')),
                                     Align(
                                         alignment: Alignment.centerLeft,
                                         child: Text("Status: $status "))
