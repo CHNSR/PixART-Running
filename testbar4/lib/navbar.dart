@@ -28,13 +28,7 @@ class _NavbarState extends State<Navbar> {
           automaticallyImplyLeading: false, // ปิดปุ่มกลับ
           flexibleSpace: Container(
             decoration: const BoxDecoration(
-              /*
-              gradient: LinearGradient(
-                colors: [Color(0xFF1a2e05), Color(0xFF3f6212)], // ใส่สีของ Gradient
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
-              */
+              
               color: Color(0xFFf9f4ef),
               border: Border(bottom: BorderSide(width: 3,color: Color(0xFF0f0e17)))
             ),

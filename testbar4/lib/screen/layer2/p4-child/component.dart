@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:testbar4/screen/layer2/p4-child/addcontanceSC.dart';
 
 class StartChallenge extends StatelessWidget {
@@ -40,16 +42,49 @@ class StartChallenge extends StatelessWidget {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Challenge Details'),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15), // กำหนด BorderRadius ให้มน
+            side: BorderSide(
+              color: Color(0xFF020826),
+              width: 2,
+            ),
+          ),
+          title: Text('Challenge Details',
+            style: GoogleFonts.pixelifySans(
+                fontSize: 26,
+                fontWeight: FontWeight.w500,
+                color: Color(0xFF0f0e17),
+              ),
+          ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Name: ${selectedChallenge!['name'] ?? 'No name'}'),
-              Text('Distance: ${selectedChallenge!['distance']} meters'),
-              Text('Start Date: ${selectedChallenge!['start_date'].toDate()}'),
-              Text('End Date: ${selectedChallenge!['end_date'].toDate()}'),
-              Text('Expend: ${selectedChallenge!['expend']}'),
+              Text('Name: ${selectedChallenge!['name'] ?? 'No name'}',
+              style: GoogleFonts.pixelifySans(
+                  fontSize: 16, fontWeight: FontWeight.w600, color: Color(0xFF020826),
+                ),
+              ),
+              Text('Distance: ${selectedChallenge!['distance']} meters',
+              style: GoogleFonts.pixelifySans(
+                  fontSize: 16, fontWeight: FontWeight.w600, color: Color(0xFF020826),
+                ),
+              ),
+              Text('Start Date: ${DateFormat('yyyy-MM-dd').format(selectedChallenge!['start_date'].toDate()) }',
+              style: GoogleFonts.pixelifySans(
+                  fontSize: 16, fontWeight: FontWeight.w600, color: Color(0xFF020826),
+                ),
+              ),
+              Text('End Date: ${DateFormat('yyyy-MM-dd').format(selectedChallenge!['end_date'].toDate())}',
+              style: GoogleFonts.pixelifySans(
+                  fontSize: 16, fontWeight: FontWeight.w600, color: Color(0xFF020826),
+                ),
+              ),
+              Text('Expend: ${selectedChallenge!['expend']}',
+              style: GoogleFonts.pixelifySans(
+                  fontSize: 16, fontWeight: FontWeight.w600, color: Color(0xFF020826),
+                ),
+              ),
             ],
           ),
           actions: [
@@ -59,13 +94,21 @@ class StartChallenge extends StatelessWidget {
                   Navigator.of(context).pop(); // Close the dialog
                   onStart(); // Call the onStart callback to start the challenge
                 },
-                child: Text('Start'),
+                child: Text('Start', style: GoogleFonts.pixelifySans(
+                  fontSize: 16, fontWeight: FontWeight.w600, color: Color(0xFF020826),
+                ),),
               ),
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(); // Close the dialog
               },
-              child: Text('Cancel'),
+              child: Text('Cancel', 
+                        style: GoogleFonts.pixelifySans(
+                        fontSize: 16, 
+                        fontWeight: FontWeight.w600, 
+                        color: Color(0xFF020826),
+                        ),
+                      ),
             ),
           ],
         );
@@ -82,6 +125,7 @@ class AddChallengePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
+      
       onTap: (){
          Navigator.push(
           context,

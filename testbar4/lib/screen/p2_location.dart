@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:location/location.dart';
 import 'package:testbar4/database/Fire_Location.dart';
 import 'package:testbar4/screen/layer2/location/component/card.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -15,7 +16,7 @@ class P2Location extends StatelessWidget {
         children: [
           
           FutureBuilder<List<QueryDocumentSnapshot>>(
-            future: Location.fetchLocations(),
+            future: Locations.fetchLocations(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return Center(
@@ -38,7 +39,7 @@ class P2Location extends StatelessWidget {
                 itemCount: documents.length,
                 itemBuilder: (context, index) {
                   final doc = documents[index];
-                  final data = doc.data() as Map<String, dynamic>;
+                  //final data = doc.data() as Map<String, dynamic>;
                   final documentID = doc.id;
           
                   return Column(
@@ -61,9 +62,9 @@ class P2Location extends StatelessWidget {
             right: 16.0,
             child: FloatingActionButton(
               onPressed: (){
-                Navigator.pushNamed(context, '/p14');
+                Navigator.pushNamed(context, '/p15');
               },
-              child: const Icon(Icons.add),
+              child: const Icon(Icons.settings),
               backgroundColor: Color(0xFFeaddcf),
             )
           )

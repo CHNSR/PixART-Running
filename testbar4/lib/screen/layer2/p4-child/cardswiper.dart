@@ -61,7 +61,7 @@ class CardswiperCPState extends State<CardswiperCP> {
                 final challengeId = challenge['challengeId'];
                 final status = widget.challengeStatuses[challengeId] ?? 'Unknown';
 
-                return GestureDetector(
+                return /*GestureDetector(
                   onDoubleTap: () {
                     setState(() {
                       if (pickChallenge == index) {
@@ -75,6 +75,35 @@ class CardswiperCPState extends State<CardswiperCP> {
                   },
                   child: _buildChallengeCard(challenge, status, index == pickChallenge ),
                 );
+                */
+                GestureDetector(
+                  onDoubleTap: () {
+                    final challenge = challenges[index];
+                    final status = widget.challengeStatuses[challenge['challengeId']] ?? 'Unknown';
+
+                    // เช็คสถานะการ์ด ถ้าอยู่ในสถานะ in progress
+                    if (status == 'in progress') {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('You are already in progress with this challenge!'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    } else {
+                      setState(() {
+                        if (pickChallenge == index) {
+                          pickChallenge = -1; // ยกเลิกการเลือกถ้ากดซ้ำการ์ดที่เลือกแล้ว
+                        } else {
+                          pickChallenge = index; // select new card
+                          selectedIndex = index; // update selectIndex
+                        }
+                      });
+                      widget.onChallengeSelected(challenge);
+                    }
+                  },
+                  child: _buildChallengeCard(challenge, status, index == pickChallenge),
+                );
+
               },
               cardsCount: challenges.length,
             ),

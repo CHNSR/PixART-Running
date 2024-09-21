@@ -11,8 +11,10 @@ import 'package:testbar4/login/p4_forgetpass.dart';
 import 'package:testbar4/model/provider_userData.dart';
 import 'package:testbar4/navbar.dart';
 import 'package:testbar4/screen/layer2/activity/activity.dart';
+import 'package:testbar4/screen/layer2/activity/componente/acCpEdit.dart';
 import 'package:testbar4/screen/layer2/activity/componente/activityCP.dart';
 import 'package:testbar4/screen/layer2/location/component/addlocation.dart';
+import 'package:testbar4/screen/layer2/location/component/editlocation.dart';
 import 'package:testbar4/screen/layer2/location/navigation.dart';
 import 'package:testbar4/screen/layer2/shose/addshoes.dart';
 import 'package:testbar4/screen/layer2/shose/shoes.dart';
@@ -62,8 +64,9 @@ class Nav extends StatelessWidget {
         '/p11': (context) => Shoes(),
         '/p12': (context) => Addshoes(),
         '/p13': (context) => ActivityPage(),
-        '/p14': (context) => AddLocationPage(),
-        //'/p14': (context) => NavigationRoute(documentId: documentId)
+        //'/p14': (context) => AddLocationPageMap(),
+        '/p15': (context) => EditlocationPage(),
+        
       },
     );
   }

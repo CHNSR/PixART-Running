@@ -1,14 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 
 // Firebase instances
 final firestore = FirebaseFirestore.instance;
 final auth = FirebaseAuth.instance;
 final user = auth.currentUser;
 
-class Location {
+class Locations {
   // Save route
   static Future<void> addRoute({
+    required BuildContext context,
     required List routeData,
     required double distance,
     required String name,
@@ -22,20 +24,35 @@ class Location {
     final userId = user!.uid;
     const visit = 0;
     try {
-      await firestore.collection("Location").doc(userId).set({
+      // Using .add() to generate a new document with an auto ID
+      await firestore.collection("Location").add({
         'route': routeData,
         'distance': distance,
         'name': name,
         'visited': visit,
         'private': status,
+        'userId': userId, // Add userId field to identify the owner of the location
       });
       print("[Fire_Location][addRoute] Saved private location");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Successfully saved route [${status}]'),
+          duration: const Duration(seconds: 5),
+          backgroundColor: Colors.green,
+        ),
+      );
     } catch (e) {
-      print('[Fire_Location][addRoute] Failed to add route: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to save route: $e'),
+          duration: const Duration(seconds: 5),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
-  // Fetch data
+
   // Fetch locations
   static Future<List<QueryDocumentSnapshot>> fetchLocations() async {
     try {
@@ -49,26 +66,7 @@ class Location {
     }
   }
 
-  // Add visit
-  static Future<void> addVisit(String documentID) async {
-    try {
-      final docRef = firestore.collection('Location').doc(documentID);
-
-      // Transaction to ensure that the visit count is updated correctly
-      await firestore.runTransaction((transaction) async {
-        final docSnapshot = await transaction.get(docRef);
-
-        if (!docSnapshot.exists) {
-          throw Exception("Document does not exist");
-        }
-
-        final currentVisit = docSnapshot.data()?['visited'] ?? 0;
-        transaction.update(docRef, {'visited': currentVisit + 1});
-      });
-    } catch (e) {
-      print('Failed to add visit: $e');
-    }
-  }
+ 
 
   //fetch route
 
@@ -97,5 +95,31 @@ class Location {
       return null;
     }
   }
-  //add Private route
+
+  
+
+  // Delete route by ID (public/private)
+  static Future<void> deleteRoute(BuildContext context, String documentID) async {
+    try {
+      await firestore.collection('Location').doc(documentID).delete();
+      // Show snackbar on successful deletion
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Successfully deleted route with ID: $documentID'),
+          duration: const Duration(seconds: 2),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      // Show snackbar on failure
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to delete route: $e'),
+          duration: const Duration(seconds: 2),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
 }
