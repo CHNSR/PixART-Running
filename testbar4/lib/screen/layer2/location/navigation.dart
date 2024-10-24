@@ -7,7 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
-import 'package:testbar4/database/Fire_Activity.dart';
+import 'package:testbar4/services/firebase_service/Fire_Activity.dart';
 import 'package:testbar4/manage/manage_icon/icon_path.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'dart:typed_data';
@@ -284,6 +284,7 @@ LatLngBounds _getLatLngBounds(List<LatLng> points) {
       _isNavigation = false;
     });
   }
+  
 
   // Check if user has reached the endpoint
   void _checkIfReachedEndpoint(LatLng currentLatLng) {
@@ -295,15 +296,21 @@ LatLngBounds _getLatLngBounds(List<LatLng> points) {
       endLatLng.longitude,
     );
 
-    // If the user is within 10 meters of the endpoint, stop tracking and save data and change state of button 
+    // If the user is within 10 meters of the endpoint, stop tracking and change state of button
     if (distanceToEnd <= 10) {
       _stopTracking();
-      _saveRunData();
       setState(() {
-      _isRunning = false;
+        _isRunning = false;
+      });
+
+      // Wait for 30 seconds before saving the run data and popping the screen
+      Future.delayed(const Duration(seconds: 15), () {
+        _saveRunData();
+        Navigator.pop(context); // Navigate back to the previous screen
       });
     }
   }
+
 
   void _updatePolyline() {
     setState(() {
@@ -350,7 +357,26 @@ LatLngBounds _getLatLngBounds(List<LatLng> points) {
       time: durationInMilliseconds,
     );
 
-    print("[P3] Check call func _saveRunData to Firestore ");
+    // อัปเดตระยะทางสำหรับรองเท้าที่เลือก
+  if (_selectedShoe != null) {
+    try {
+      // รับ document ID สำหรับรองเท้าที่เลือก
+      String documentID = await _getShoeDocumentID(_selectedShoe!);
+      double newDistance = _distance / 1000; // แปลงระยะทางเป็นกิโลเมตร
+
+      // อัปเดตระยะทางใน Firestore
+      await updateDistance(documentID: documentID, newDistance: newDistance);
+
+      
+    } catch (e) {
+      print("[P2][Navigation][_savedata] shoes: add distance successfuly!  ");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Run data saved successfully!")),
+      );
+    }
+  }
+
+    print("[P2] Check call func _saveRunData to Firestore ");
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text("Run data saved successfully!")),
     );

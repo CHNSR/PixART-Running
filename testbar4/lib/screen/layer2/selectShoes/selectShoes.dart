@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:testbar4/database/Fire_Shoes.dart';
+import 'package:testbar4/services/firebase_service/Fire_Shoes.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SelectShoes extends StatefulWidget {
@@ -71,7 +71,7 @@ class _SelectShoesState extends State<SelectShoes> {
                                           ),
                                         ),
                                       ),
-                                      Text('${shoeRangeInFire.toString()} Km'),
+                                      Text('${shoeRangeInFire.toStringAsFixed(2)} Km'),
                                     ],
                                   ),
                                   onTap: () {
@@ -102,12 +102,7 @@ class _SelectShoesState extends State<SelectShoes> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        shadowColor: Colors.transparent,
-        title: const Text('Select Shoes'),
-        automaticallyImplyLeading: false,
-      ),
+
       body: FutureBuilder<List<DocumentSnapshot>>(
         future: PixARTShoes.fetchShoes(),
         builder: (context, snapshot) {
@@ -128,7 +123,12 @@ class _SelectShoesState extends State<SelectShoes> {
                 children: [
                   Expanded(
                     child: Container(
-                      
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(15),
+                        border: Border.all(width: 3,color: Color(0xFF020826)),
+                        color: Color(0xFFf9f4ef,),
+                        
+                      ),
                       child: Row(
                         children: [
                           ElevatedButton(

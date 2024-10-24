@@ -7,10 +7,12 @@ import 'package:intl/intl.dart';
 import 'package:location/location.dart';
 import 'package:provider/provider.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
-import 'package:testbar4/database/Fire_Activity.dart';
+import 'package:testbar4/services/firebase_service/Fire_Activity.dart';
 import 'package:testbar4/manage/manage_icon/icon_path.dart';
 import 'package:testbar4/model/provider_userData.dart';
 import 'package:testbar4/screen/layer2/selectShoes/selectShoes.dart';
+
+import '../manage/manage_icon/icon_path.dart';
 
 //import 'package:testbar2/model/entry.dart';
 
@@ -25,7 +27,7 @@ class _RunPageState extends State<P3Run> {
   final Activity activity = Activity();
   // for store the value about tracking
   final Set<Polyline> polyline = {};
-
+  IconPath iconPath = IconPath();
   List<LatLng> route = [];
 
   double _avgSpeed = 0;
@@ -44,6 +46,7 @@ class _RunPageState extends State<P3Run> {
   late int _time;
   bool _isShoeSelected =false;
   String? _selectedShoe;
+  BitmapDescriptor? _markerIcon;
   
 
 
@@ -56,7 +59,19 @@ class _RunPageState extends State<P3Run> {
   @override
   void initState() {
     super.initState();
+    _loadCustomMarkers();
     _getUserLocation();
+  }
+  Future<void> _loadCustomMarkers() async {
+     final BitmapDescriptor startIcon = await BitmapDescriptor.asset(
+      const ImageConfiguration(size: Size(35, 35)),
+      iconPath.appBarIcon('pin_red_pixel'),
+    );
+
+    setState(() {
+      _markerIcon = startIcon;
+  
+    });
   }
 
   Future<void> _getUserLocation() async {
@@ -98,10 +113,12 @@ class _RunPageState extends State<P3Run> {
           markerId: MarkerId('currentLocation'),
           position: _center,
           infoWindow: InfoWindow(title: 'Current Location'),
+          icon: _markerIcon! ,
         ),
       );
     });
   }
+
 
   void _onMapCreated(GoogleMapController controller) {
     _mapController = controller;
@@ -133,6 +150,7 @@ class _RunPageState extends State<P3Run> {
             markerId: const MarkerId('currentLocation'),
             position: loc,
             infoWindow: const InfoWindow(title: 'Current Location'),
+            icon: _markerIcon!,
           ),
         );
 
@@ -283,115 +301,146 @@ static Future<void> updateDistance({
               alignment: Alignment.bottomCenter,
               child: Container(
                 width: double.infinity,
-                height: 160,
+                height: 85,
                 margin: const EdgeInsets.fromLTRB(10, 0, 10, 4),
                 padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
                 decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(5)),
+                  color: Color(0xFFf9f4ef),
+                  border: Border.all(width: 1.8, color: Color(0xFF020826))
+                ),
                 child: Column(
                   children: [
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      
                       children: [
-                        Column(
-                          children: [
-                            Text("SPEED (KM/H)",
-                                style: GoogleFonts.montserrat(
-                                    fontSize: 10, fontWeight: FontWeight.w300)),
-                            Text(_speed.toStringAsFixed(2),
-                                style: GoogleFonts.montserrat(
-                                    fontSize: 30, fontWeight: FontWeight.w300))
-                          ],
-                        ),
-                        Column(
-                          children: [
-                            Text("TIME",
-                                style: GoogleFonts.montserrat(
-                                    fontSize: 10, fontWeight: FontWeight.w300)),
-                            StreamBuilder<int>(
-                              stream: _stopWatchTimer.rawTime,
-                              initialData: 0,
-                              builder: (context, snap) {
-                                if (snap.hasData) {
-                                  _time = snap.data!;
-                                  _displayTime = StopWatchTimer.getDisplayTimeHours(_time) +
-                                      ":" +
-                                      StopWatchTimer.getDisplayTimeMinute(_time) +
-                                      ":" +
-                                      StopWatchTimer.getDisplayTimeSecond(_time);
-                                  return Text(
-                                    _displayTime,
-                                    style: GoogleFonts.montserrat(
-                                      fontSize: 30,
-                                      fontWeight: FontWeight.w300,
-                                    ),
-                                  );
-                                } else {
-                                  return Text(
-                                    '00:00:00',
-                                    style: GoogleFonts.montserrat(
-                                      fontSize: 30,
-                                      fontWeight: FontWeight.w300,
-                                    ),
-                                  );
-                                }
-                              },
-                            )
-
-                          ],
-                        ),
-                        Column(
-                          children: [
-                            Text("DISTANCE (KM)",
-                                style: GoogleFonts.montserrat(
-                                    fontSize: 10, fontWeight: FontWeight.w300)),
-                            Text((_dist / 1000).toStringAsFixed(2),
-                                style: GoogleFonts.montserrat(
-                                    fontSize: 30, fontWeight: FontWeight.w300))
-                          ],
-                        )
-                      ],
-                    ),
-
-                    // Divider is a line
-                    Divider(),
-
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Spacer(),
-                        const Spacer(),
-
                         if (_isRunning) ...[
                           // ปุ่ม "Stop"
-                          GestureDetector(
-                            onTap: () {
-                              _stopTracking();
-                              print("[P3]---------Tap save data---------");
-                              // save data to Firestore
-                              _saveRunData();
-                              Navigator.pushNamed(context, '/main');
-                            },
-                            child: Image.asset(
-                              IconPath().appBarIcon('finish_outline'),
-                              width: 50,
-                              height: 50,
+                          Center(
+                            child: GestureDetector(
+                              onTap: () {
+                                _stopTracking();
+                                print("[P3]---------Tap save data---------");
+                                // save data to Firestore
+                                _saveRunData();
+                                Navigator.pushNamed(context, '/main');
+                              },
+                              child: Image.asset(
+                                IconPath().appBarIcon('finish_outline'),
+                                width: 40,
+                                height: 40,
+                              ),
                             ),
                           ),
                           const Spacer(),
+                          //container for time 
+                          Container(
+                            child: Row(
+                              children: [
+                                Column(
+                                  children: [
+                                    Text("SPEED (KM/H)",
+                                        style: GoogleFonts.pixelifySans(
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w400,
+                                          color: Color(0xFF0f0e17),
+                                        ),
+                                    ),
+                                    Text(_speed.toStringAsFixed(2),
+                                        style: GoogleFonts.pixelifySans(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w500,
+                                        color: Color(0xFF0f0e17),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                                Column(
+                                  children: [
+                                    Text("TIME",
+                                      style: GoogleFonts.pixelifySans(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w500,
+                                      color: Color(0xFF0f0e17),
+                                    ),
+                                    ),
+                                    StreamBuilder<int>(
+                                      stream: _stopWatchTimer.rawTime,
+                                      initialData: 0,
+                                      builder: (context, snap) {
+                                        if (snap.hasData) {
+                                          _time = snap.data!;
+                                          _displayTime = StopWatchTimer.getDisplayTimeHours(_time) +
+                                              ":" +
+                                              StopWatchTimer.getDisplayTimeMinute(_time) +
+                                              ":" +
+                                              StopWatchTimer.getDisplayTimeSecond(_time);
+                                          return Text(
+                                            _displayTime,
+                                            style: GoogleFonts.pixelifySans(
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.w500,
+                                              color: Color(0xFF0f0e17),
+                                            ),
+                                          );
+                                        } else {
+                                          return Text(
+                                            '00:00:00',
+                                            style: GoogleFonts.pixelifySans(
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.w500,
+                                              color: Color(0xFF0f0e17),
+                                            ),
+                                          );
+                                        }
+                                      },
+                                    )
+
+                                  ],
+                                ),
+                                Column(
+                                  children: [
+                                    Text("DISTANCE (KM)",
+                                        style: GoogleFonts.pixelifySans(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w500,
+                                        color: Color(0xFF0f0e17),
+                                      ),
+                                    ),
+                                    Text(
+                                      (_dist / 1000).toStringAsFixed(2),
+                                      style: GoogleFonts.pixelifySans(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w500,
+                                        color: Color(0xFF0f0e17),
+                                      ),
+                                    )
+                                  ],
+                                )
+                              ],
+                            ),
+                          ),
+                          const Spacer(),
+
                           // ปุ่ม "End"
                           GestureDetector(
                             onTap: () {
-                              print("[P3]---------Tap save data---------");
-                              // save data to Firestore
-                              _saveRunData();
-                              Navigator.pushNamed(context, '/main');
+                              
                             },
-                            child: Image.asset(
-                              IconPath().appBarIcon('square_outline'),
-                              width: 40,
-                              height: 40,
+                            child: Column(
+                              children: [
+                                Image.asset(
+                                    _isShoeSelected
+                                        ? IconPath().appBarIcon('shoesSelection_outline') // ไอคอนใหม่เมื่อเลือกรองเท้า
+                                        : IconPath().appBarIcon('shoesSelection_select'),
+                                    width: 40,
+                                    height: 40,
+                                  ),
+                                  if (_selectedShoe != null) // แสดงชื่อรองเท้าที่เลือกใต้ไอคอน
+                                    Text(
+                                      _selectedShoe!,
+                                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w300),
+                                    ),
+                              ],
                             ),
                           ),
                         ] else ...[
@@ -407,6 +456,94 @@ static Future<void> updateDistance({
                             ),
                           ),
                           const Spacer(),
+                          Container(
+                            child: Row(
+                              children: [
+                                Column(
+                                  children: [
+                                    Text("SPEED (KM/H)",
+                                        style: GoogleFonts.pixelifySans(
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w400,
+                                          color: Color(0xFF0f0e17),
+                                        ),
+                                    ),
+                                    Text(_speed.toStringAsFixed(2),
+                                        style: GoogleFonts.pixelifySans(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w500,
+                                        color: Color(0xFF0f0e17),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                                Column(
+                                  children: [
+                                    Text("TIME",
+                                      style: GoogleFonts.pixelifySans(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                      color: Color(0xFF0f0e17),
+                                    ),
+                                    ),
+                                    StreamBuilder<int>(
+                                      stream: _stopWatchTimer.rawTime,
+                                      initialData: 0,
+                                      builder: (context, snap) {
+                                        if (snap.hasData) {
+                                          _time = snap.data!;
+                                          _displayTime = StopWatchTimer.getDisplayTimeHours(_time) +
+                                              ":" +
+                                              StopWatchTimer.getDisplayTimeMinute(_time) +
+                                              ":" +
+                                              StopWatchTimer.getDisplayTimeSecond(_time);
+                                          return Text(
+                                            _displayTime,
+                                            style: GoogleFonts.pixelifySans(
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.w500,
+                                              color: Color(0xFF0f0e17),
+                                            ),
+                                          );
+                                        } else {
+                                          return Text(
+                                            '00:00:00',
+                                            style: GoogleFonts.pixelifySans(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w500,
+                                              color: Color(0xFF0f0e17),
+                                            ),
+                                          );
+                                        }
+                                      },
+                                    )
+
+                                  ],
+                                ),
+                                Column(
+                                  children: [
+                                    Text("DISTANCE (KM)",
+                                        style: GoogleFonts.pixelifySans(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w500,
+                                        color: Color(0xFF0f0e17),
+                                      ),
+                                    ),
+                                    Text(
+                                      (_dist / 1000).toStringAsFixed(2),
+                                      style: GoogleFonts.pixelifySans(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w500,
+                                        color: Color(0xFF0f0e17),
+                                      ),
+                                    )
+                                  ],
+                                )
+                              ],
+                            ),
+                          ),
+                          const Spacer(),
+
                           // ปุ่ม "Square"
                           GestureDetector(
                             onTap: () {
@@ -449,7 +586,6 @@ static Future<void> updateDistance({
                         ],
                       ],
                     )
-
                   ],
                 ),
               ),

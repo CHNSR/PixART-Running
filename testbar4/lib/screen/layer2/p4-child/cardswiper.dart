@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 import 'package:provider/provider.dart';
-import 'package:testbar4/database/Fire_UserChallenge.dart';
+import 'package:testbar4/services/firebase_service/Fire_UserChallenge.dart';
 import 'package:testbar4/model/provider_userData.dart';
 
 class CardswiperCP extends StatefulWidget {
@@ -32,11 +32,14 @@ class CardswiperCPState extends State<CardswiperCP> {
     return Color(int.parse(hexString.replaceFirst('#', '0x')));
   }
 
-
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance.collection("Challenge").snapshots(),
+      // กรองข้อมูลตาม end_date ที่ยังไม่หมดอายุ
+      stream: FirebaseFirestore.instance
+          .collection("Challenge")
+          .where('end_date', isGreaterThanOrEqualTo: Timestamp.now())
+          .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
@@ -53,65 +56,53 @@ class CardswiperCPState extends State<CardswiperCP> {
 
           return SizedBox(
             height: 200,
-            child: CardSwiper(
-              controller: swiperController,
-              initialIndex: selectedIndex >= 0 ? selectedIndex : 0, // ถ้า selectedIndex มีค่ามากกว่า 0 ก็จะเริ่มต้นด้วย index นั้น
-              cardBuilder: (context, index, percentThresholdX, percentThresholdY) {
-                final challenge = challenges[index];
-                final challengeId = challenge['challengeId'];
-                final status = widget.challengeStatuses[challengeId] ?? 'Unknown';
+            child: challenges.length == 1
+                ? _buildChallengeCard(challenges[0], widget.challengeStatuses[challenges[0]['challengeId']] ?? 'Unknown', true)
+                : CardSwiper(
+                    controller: swiperController,
+                    initialIndex: selectedIndex >= 0 ? selectedIndex : 0,
+                    cardBuilder: (context, index, percentThresholdX, percentThresholdY) {
+                      final challenge = challenges[index];
+                      final challengeId = challenge['challengeId'];
+                      final status = widget.challengeStatuses[challengeId] ?? 'Unknown';
 
-                return /*GestureDetector(
-                  onDoubleTap: () {
-                    setState(() {
-                      if (pickChallenge == index) {
-                        pickChallenge = -1; // ยกเลิกการเลือกถ้ากดซ้ำการ์ดที่เลือกแล้ว
-                      } else {
-                        pickChallenge = index; //  select new card
-                        selectedIndex = index; // update selectIndex
-                      }
-                    });
-                    widget.onChallengeSelected(challenge);
-                  },
-                  child: _buildChallengeCard(challenge, status, index == pickChallenge ),
-                );
-                */
-                GestureDetector(
-                  onDoubleTap: () {
-                    final challenge = challenges[index];
-                    final status = widget.challengeStatuses[challenge['challengeId']] ?? 'Unknown';
+                      return GestureDetector(
+                        onDoubleTap: () {
+                          final challenge = challenges[index];
+                          final status = widget.challengeStatuses[challenge['challengeId']] ?? 'Unknown';
 
-                    // เช็คสถานะการ์ด ถ้าอยู่ในสถานะ in progress
-                    if (status == 'in progress') {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('You are already in progress with this challenge!'),
-                          backgroundColor: Colors.red,
-                        ),
+                          // เช็คสถานะการ์ด ถ้าอยู่ในสถานะ in progress
+                          if (status == 'in progress') {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('You are already in progress with this challenge!'),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          } else {
+                            setState(() {
+                              if (pickChallenge == index) {
+                                pickChallenge = -1; // ยกเลิกการเลือกถ้ากดซ้ำการ์ดที่เลือกแล้ว
+                              } else {
+                                pickChallenge = index; // select new card
+                                selectedIndex = index; // update selectIndex
+                              }
+                            });
+                            widget.onChallengeSelected(challenge);
+                          }
+                        },
+                        child: _buildChallengeCard(challenge, status, index == pickChallenge),
                       );
-                    } else {
-                      setState(() {
-                        if (pickChallenge == index) {
-                          pickChallenge = -1; // ยกเลิกการเลือกถ้ากดซ้ำการ์ดที่เลือกแล้ว
-                        } else {
-                          pickChallenge = index; // select new card
-                          selectedIndex = index; // update selectIndex
-                        }
-                      });
-                      widget.onChallengeSelected(challenge);
-                    }
-                  },
-                  child: _buildChallengeCard(challenge, status, index == pickChallenge),
-                );
-
-              },
-              cardsCount: challenges.length,
-            ),
+                    },
+                    cardsCount: challenges.length,
+                  ),
           );
+
         }
       },
     );
   }
+
 
   Widget _buildChallengeCard(Map<String, dynamic> challenge, String status, bool isSelected) {
     Color statusColor;

@@ -1,7 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:testbar4/database/Fire_Shoes.dart';
+import 'package:testbar4/services/firebase_service/Fire_Shoes.dart';
 
 class AddTxtField extends StatelessWidget {
   final TextEditingController controller;

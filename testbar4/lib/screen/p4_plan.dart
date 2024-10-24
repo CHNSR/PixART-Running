@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 //import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 import 'package:provider/provider.dart';
-import 'package:testbar4/database/Fire_UserChallenge.dart';
+import 'package:testbar4/services/firebase_service/Fire_UserChallenge.dart';
 import 'package:testbar4/model/provider_userData.dart';
 import 'package:testbar4/screen/layer2/p4-child/cardswiper.dart';
 import 'package:testbar4/screen/layer2/p4-child/component.dart';

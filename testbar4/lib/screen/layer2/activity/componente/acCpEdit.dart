@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:location/location.dart';
-import 'package:testbar4/database/Fire_Activity.dart';
-import 'package:testbar4/database/Fire_Location.dart';
+import 'package:provider/provider.dart';
+import 'package:testbar4/services/firebase_service/Fire_Activity.dart';
+import 'package:testbar4/services/firebase_service/Fire_Location.dart';
 import 'package:testbar4/manage/manage_icon/icon_path.dart';
 import 'package:testbar4/screen/layer2/activity/componente/activityCP.dart';
+
+import '../../../../model/provider_userData.dart';
 
 class AddCardAc extends StatefulWidget {
   const AddCardAc({super.key, required this.numOfCard, this.startDate, this.endDate, required this.methodFetch, required this.mapstatus});
@@ -67,7 +70,11 @@ class _CardAcForPublicState extends State<AddCardAc> {
   
 @override
 Widget build(BuildContext context) {
-  return FutureBuilder<List<Map<String, dynamic>>>(
+  return Consumer<UserDataPV>(builder:(context, userDataProvider, child){
+    final userData = userDataProvider.userData;
+    final userId = userData?['id'] ?? 'error';
+    return FutureBuilder<List<Map<String, dynamic>>>(
+    
     future: _activitiesFuture,
     builder: (context, snapshot) {
       // Handle loading state
@@ -163,6 +170,7 @@ Widget build(BuildContext context) {
                                 distance: distanceInMetres,
                                 name: _nameController.text, // Use the input name
                                 status: widget.mapstatus,
+                                userId: userId
                               );
                             },
                             icon: Image.asset(
@@ -183,6 +191,9 @@ Widget build(BuildContext context) {
       );
     },
   );
+  });
+  
+  
 }
 
 @override

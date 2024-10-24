@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:testbar4/database/Fire_Location.dart';
+import 'package:testbar4/services/firebase_service/Fire_Location.dart';
 import 'package:testbar4/screen/layer2/activity/componente/acCpEdit.dart';
 import 'package:testbar4/screen/layer2/location/component/addlocation.dart';
 import 'package:testbar4/screen/layer2/location/component/card.dart';
@@ -23,7 +23,7 @@ class _EditlocationPageState extends State<EditlocationPage> {
   @override
   Widget build(BuildContext context) {
     final userDataProvider = Provider.of<UserDataPV>(context); // Get the provider
-    final runnerId = userDataProvider.userData?['id']; // Access the runnerId
+    final userId = userDataProvider.userData?['id']; // Access the runnerId
     
     
     return Scaffold(
@@ -46,7 +46,7 @@ class _EditlocationPageState extends State<EditlocationPage> {
         backgroundColor: Colors.transparent,
       ),
       body: FutureBuilder<List<QueryDocumentSnapshot>>(
-        future: Locations.fetchLocations(),  // ดึงข้อมูลตำแหน่ง
+        future: Locations.fetchPrivateLocations(userId),  // ดึงข้อมูลตำแหน่ง
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(
@@ -77,7 +77,7 @@ class _EditlocationPageState extends State<EditlocationPage> {
                 children: [
                   CardForEdit(
                     docId: documentID,
-                    runnerId: runnerId,
+                    runnerId: userId,
                     data: doc, // ส่งค่า data ของเอกสาร
                   ),
                   const SizedBox(height: 10),

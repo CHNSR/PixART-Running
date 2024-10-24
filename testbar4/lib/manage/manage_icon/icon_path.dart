@@ -80,13 +80,15 @@ class IconPath {
     "pin_black":"assets/image/icon/pin_black.png",
     "pin_red":"assets/image/icon/pin_red.png",
     "pin_green":"assets/image/icon/pin_green.png",
+    "pin_red_pixel":"assets/image/icon/pin_red_pixel.png",
     //play
     "play-button_outline":"assets/image/icon/play-button_outline.png",
     //end
     "the-end_outline":"assets/image/icon/the-end_outline.png",
     //pause
     "pause_outline":"assets/image/icon/pause_outline.png",
-    
+    //user profile defult
+    "userprofile_defult":"assets/image/icon/userprofile_defult.png",
 
     
   };

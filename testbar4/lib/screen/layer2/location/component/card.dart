@@ -1,164 +1,106 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:testbar4/database/Fire_Location.dart';
+import 'package:testbar4/services/firebase_service/Fire_Location.dart';
 import 'package:testbar4/manage/manage_icon/icon_path.dart';
 import 'package:testbar4/model/provider_userData.dart';
 import 'package:testbar4/screen/layer2/location/component/map.dart';
 import 'package:testbar4/screen/layer2/location/navigation.dart';
 
-import '../../../../database/Fire_Visit.dart';
+import '../../../../services/firebase_service/Fire_Visit.dart';
 
 class CardLocation extends StatelessWidget {
-  final String documentId;
+  final Map<String, dynamic> data;
   final IconPath iconpath = IconPath();
 
-  CardLocation({super.key, required this.documentId});
-
-  Future<Map<String, dynamic>?> _fetchLocationData() async {
-    try {
-      final docSnapshot = await FirebaseFirestore.instance
-          .collection('Location')
-          .doc(documentId)
-          .get();
-      if (docSnapshot.exists) {
-        return docSnapshot.data() as Map<String, dynamic>;
-      }
-    } catch (e) {
-      print('Failed to fetch location data: $e');
-    }
-    return null;
-  }
+  CardLocation({super.key, required this.data});
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<Map<String, dynamic>?>(
-      future: _fetchLocationData(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
+    // Retrieve data
+    final name = data['name'] ?? 'Unknown';
+    final distanceInMeters = data['distance'] ?? 0.0;
+    final distanceInKilometers = (distanceInMeters / 1000).toStringAsFixed(2);
+    final route = data['route'] as List<dynamic>?;
+    final status = data['private'] == true ? 'Private' : 'Public';
+    final visit = data['visit'] ?? 0 ;
 
-        if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}'));
-        }
+    // Cast route data if available
+    if (route != null) {
+      final List<Map<String, dynamic>> routeList = route.map((item) {
+        return item as Map<String, dynamic>;
+      }).toList();
 
-        if (!snapshot.hasData || snapshot.data == null) {
-          return const Center(child: Text('No data found'));
-        }
+      print("[P2][Card] Route data before passing to ShowMap(): $routeList");
 
-      final data = snapshot.data!;
-      final name = data['name'] ?? 'Unknown';
-      final distanceInMeters = data['distance'] ?? 0.0;
-      final distanceInKilometers = (distanceInMeters / 1000).toStringAsFixed(2);
-      final route = data['route'] as List<dynamic>?;
-      final status = data["private"] == true ? "private" : "public";
-
-      // Rest of your code...
-
-        // Cast to List<dynamic>
-
-        if (route != null) {
-          // Convert List<dynamic> to List<Map<String, dynamic>>
-          final List<Map<String, dynamic>> routeList = route.map((item) {
-            return item as Map<String, dynamic>;
-          }).toList();
-
-          print("[P2][Card] Check route before send to ShowMap(): $routeList");
-
-          return Container(
-            
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(15.0),
-              border: Border.all(width: 2.0,color: Colors.black),
-              color: Colors.white,
-
-
-            ),
-            
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+      return Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(15.0),
+          border: Border.all(width: 1.0, color: Colors.black),
+          color: Colors.white,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                name,
+                style: const TextStyle(
+                    fontSize: 20, fontWeight: FontWeight.w500),
+              ),
+              const SizedBox(height: 8.0),
+              SizedBox(
+                height: 200,  // Define a fixed height
+                child: ShowMap2(
+                  route: routeList,  // Pass the converted list to ShowMap2
+                ),
+              ),
+              const SizedBox(height: 8.0),
+              Row(
                 children: [
-                  Text(
-                    name,
-                    style: const TextStyle(
-                        fontSize: 20, fontWeight: FontWeight.w500),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Distance: $distanceInKilometers km'),
+                        Text('Status: $status'),
+                        Text('Visit: ${visit} times'),
+                      ],
+                    ),
                   ),
-                  const SizedBox(height: 8.0),
-                  SizedBox(
-                    height: 200, // Define a fixed height
-                    child: ShowMap2(
-                      route: routeList, // Pass the converted list
-                    ), // Assume this widget will render map based on fetched data
-                  ),
-                  const SizedBox(height: 8.0),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          children: [
-                            ListTile(
-                                title: Text(name),
-                                subtitle: Column(
-                                  children: [
-                                    const Divider(
-                                      height: 2,
-                                      color: Colors.grey,
-                                    ),
-                                    const SizedBox(
-                                      height: 3,
-                                    ),
-                                    Align(
-                                        alignment: Alignment.centerLeft,
-                                        child: Text('Distance: $distanceInKilometers km')),
-                                    Align(
-                                        alignment: Alignment.centerLeft,
-                                        child: Text("Status: $status ")),
-                                    Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: Text("Visit: --[demo data]-- "),
-                                    ),
-                                  ],
-                                )),
-                          ],
+                  IconButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => Navigation(
+                            route: routeList,
+                          ),
                         ),
-                      ),
-                      IconButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => Navigation(
-                                route: routeList,
-                              ),
-                            ),
-                          );
-                        },
-                        icon: Image.asset(
-                          width: 30,
-                          height: 30,
-                          iconpath.appBarIcon("navigation_outline"),
-                        ),
-                      ),
-                      const SizedBox(
-                        width: 10,
-                      )
-                    ],
+                      );
+                    },
+                    icon: Image.asset(
+                      width: 30,
+                      height: 30,
+                      iconpath.appBarIcon('navigation_outline'),
+                    ),
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(width: 10),
                 ],
               ),
-            ),
-          );
-        } else {
-          return const Center(child: Text('No route data found'));
-        }
-      },
-    );
+              const SizedBox(height: 10),
+            ],
+          ),
+        ),
+      );
+    } else {
+      return const Center(child: Text('No route data found'));
+    }
   }
 }
+
+
 //card for edit it can delete change name
 class CardForEdit extends StatelessWidget {
   final String docId;
@@ -178,6 +120,7 @@ class CardForEdit extends StatelessWidget {
     final distanceInKilometers = (distanceInMeters / 1000).toStringAsFixed(2);
     final route = data['route'] as List<dynamic>?;
     final status = data["private"] == true ? "private" : "public";
+    final visit = data['visit'] ?? 0 ;
     final userDataPV = Provider.of<UserDataPV>(context, listen: false);
 
     if (route != null) {
@@ -204,8 +147,12 @@ class CardForEdit extends StatelessWidget {
                     fontSize: 20, fontWeight: FontWeight.w500),
               ),
               const SizedBox(height: 8.0),
-              SizedBox(
-                height: 200, // Define a fixed height
+              Container(
+                height: 200, 
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(3.0),
+                  border: Border.all(width: 1.0, color: Colors.black),
+                ),
                 child: ShowMap2(
                   route: routeList, // Pass the converted list
                 ),
@@ -236,7 +183,7 @@ class CardForEdit extends StatelessWidget {
                               ),
                               Align(
                                 alignment: Alignment.centerLeft,
-                                child: Text("Visit: --[demo data]-- "),
+                                child: Text("Visit: ${visit} times"),
                               ),
                             ],
                           ),

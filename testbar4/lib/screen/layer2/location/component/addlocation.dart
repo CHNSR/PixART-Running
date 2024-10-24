@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:testbar4/database/Fire_Activity.dart';
+import 'package:testbar4/services/firebase_service/Fire_Activity.dart';
 import 'package:testbar4/screen/layer2/activity/componente/activityCP.dart';
 
 import '../../activity/componente/acCpEdit.dart';

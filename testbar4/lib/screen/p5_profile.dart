@@ -1,11 +1,16 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:testbar4/database/Fire_Activity.dart';
-import 'package:testbar4/database/Fire_User.dart';
+import 'package:testbar4/screen/layer2/p5-child/profilePick.dart';
+import 'package:testbar4/services/firebase_service/Fire_Activity.dart';
+import 'package:testbar4/services/firebase_service/Fire_User.dart';
 import 'package:testbar4/manage/manage_icon/icon_path.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:testbar4/model/provider_userData.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
+
+import '../manage/userprofile/user_path.dart';  
 
 class P5Profile extends StatefulWidget {
   P5Profile({super.key});
@@ -17,7 +22,7 @@ class P5Profile extends StatefulWidget {
 
 class _P5ProfileState extends State<P5Profile> {
   IconPath iconPath = IconPath();
-
+  UserProfile userProfile = UserProfile();
 
   String? bestAVGpace;
   String? bestAVGpacedate;
@@ -29,6 +34,7 @@ class _P5ProfileState extends State<P5Profile> {
   String? totalAVGpace;
   String? totalHouse; 
 
+  
 
   @override
   void initState() {
@@ -106,20 +112,34 @@ class _P5ProfileState extends State<P5Profile> {
   }
 
   void _logout(BuildContext context) async {
-  // Sign out from Firebase Auth
-  await FirebaseAuth.instance.signOut();
+    // Sign out from Firebase Auth
+    await FirebaseAuth.instance.signOut();
 
-  // Reset the provider state by calling a method to clear user data
-  Provider.of<UserDataPV>(context, listen: false).clearUserData();
+    // Reset the provider state by calling a method to clear user data
+    Provider.of<UserDataPV>(context, listen: false).clearUserData();
 
-    // Reset runnerID in the Activity class
-  Activity.runnerID = null;
-  
-  print('Logout successful');
+      // Reset runnerID in the Activity class
+    Activity.runnerID = null;
+    
+    print('Logout successful');
 
-  // Navigate to the login screen
-  Navigator.pushNamed(context, '/p7');
-}
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text("Logout Successful",
+          style: TextStyle(
+            color: Colors.white
+          ),
+        ),
+        duration: Duration(seconds: 3),
+        shape: Border.all(width: 1,color: Color(0xFF020826)),
+        backgroundColor: Color(0xFFf25042),
+      
+      ),
+    );
+
+    // Navigate to the login screen
+    Navigator.pushNamed(context, '/p7');
+  }
 
 
   @override
@@ -146,11 +166,32 @@ class _P5ProfileState extends State<P5Profile> {
                 const SizedBox(
                   height: 20.0,
                 ),
-                const Center(
+                /*
+                Center(
                   child: CircleAvatar(
                     radius: 50,
-                    backgroundImage: NetworkImage(
-                        'https://www.flaticon.com/free-icons/pixel'), // URL รูปโปรไฟล์
+                    backgroundColor: Colors.white,
+                    child: Image.asset(iconPath.appBarIcon("userprofile_defult")),
+                  ),
+                ),
+                */
+                 GestureDetector(
+                  onTap: () {
+                    // เมื่อกด CircleAvatar จะนำไปหน้า Profilepick
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const Profilepick()),
+                    );
+                  },
+                  child: Center(
+                    child: CircleAvatar(
+                      radius: 50,
+                      backgroundColor: Colors.white,
+                      child: Image.asset(
+                        userProfile.userProfileImg("userprofile_defult"),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -228,7 +269,7 @@ class _P5ProfileState extends State<P5Profile> {
                             height: 40,
                           ),
                           title: const Text('Logout'),
-                          //subtitle: Text('chanonsukrod@gmail.com'),
+                          
                         ),
                       ),
                     ],
@@ -269,14 +310,14 @@ class _P5ProfileState extends State<P5Profile> {
                           children: [
                             Expanded(
                               child: ListTile(
-                                title: Text(totalHouse!,style: const TextStyle(fontSize: 22),),
+                                title: Expanded(child: Text(totalHouse!,style: const TextStyle(fontSize: 22),)),
                                 subtitle: const Text("Total Hour",style: TextStyle(fontSize: 20),),
                               )
                             ),
                             Expanded(
                               child: ListTile(
-                                title: Text("data",style: TextStyle(fontSize: 25),),
-                                subtitle: Text("data",style: TextStyle(fontSize: 20),),
+                                title: Text("2/3",style: TextStyle(fontSize: 25),),
+                                subtitle: Text("Weekly goal",style: TextStyle(fontSize: 20),),
                               )
                             ),
                             Expanded(

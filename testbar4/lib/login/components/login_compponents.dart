@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
-import 'package:testbar4/database/Fire_Activity.dart';
+import 'package:testbar4/services/firebase_service/Fire_Activity.dart';
 import 'package:testbar4/login/p5_aftersign_inwithG.dart';
 import 'package:testbar4/model/provider_userData.dart';
 

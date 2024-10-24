@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:testbar4/database/Fire_User.dart'; // ตรวจสอบให้แน่ใจว่าพาธนี้ถูกต้อง
+import 'package:testbar4/services/firebase_service/Fire_User.dart'; // ตรวจสอบให้แน่ใจว่าพาธนี้ถูกต้อง
 
 class UserDataPV extends ChangeNotifier {
   PixARTUser pixARTUser = PixARTUser();

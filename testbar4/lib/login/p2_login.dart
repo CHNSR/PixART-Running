@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:testbar4/login/child/form.dart';
 import 'package:testbar4/login/components/login_compponents.dart';
 import 'package:testbar4/manage/manage_icon/icon_path.dart';
+import 'package:testbar4/services/auth_service/auth_service.dart';
 
 class P2Login extends StatelessWidget {
   P2Login({super.key});
@@ -12,7 +14,7 @@ class P2Login extends StatelessWidget {
   final passwordController = TextEditingController();
 
   final IconPath iconPath = IconPath();
-  final SigninGoogle signinGoogle = SigninGoogle();
+  
 
   @override
   Widget build(BuildContext context) {
@@ -146,63 +148,76 @@ class P2Login extends StatelessWidget {
                   height: 10.0,
                 ),
                 // for logo to login
-                GestureDetector(
-                  onTap: () async {
-                    await signinGoogle.signInWithGoogle(context);
-                  },
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        width: 110,
-                        padding: EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.white),
-                          borderRadius: BorderRadius.circular(16),
-                          color: Colors.grey[200],
-                        ),
-                        child: Column(
-                          children: [
-                            Image.asset(
-                              iconPath.appBarIcon('google_outline'),
-                              width: 50,
-                              height: 50,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                      GestureDetector(
+                        onTap: (){
+                           Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const RegisterwithGoogle(), // เพิ่ม MaterialPageRoute
                             ),
-                            const SizedBox(
-                              height: 5,
-                            ),
-                            Text('google')
-                          ],
+                          );
+                          print("click sign with google");
+                        },
+                        child: Container(
+                          width: 110,
+                          padding: EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.white),
+                            borderRadius: BorderRadius.circular(16),
+                            color: Colors.grey[200],
+                          ),
+                          child: Column(
+                            children: [
+                              Image.asset(
+                                iconPath.appBarIcon('google_outline'),
+                                width: 50,
+                                height: 50,
+                              ),
+                              const SizedBox(
+                                height: 5,
+                              ),
+                              Text('google')
+                            ],
+                          ),
                         ),
                       ),
                       const SizedBox(
                         width: 20,
                       ),
-                      Container(
-                        width: 110,
-                        padding: EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.white),
-                          borderRadius: BorderRadius.circular(16),
-                          color: Colors.grey[200],
-                        ),
-                        child: Column(
-                          children: [
-                            Image.asset(
-                              iconPath.appBarIcon('facebook_outline'),
-                              width: 50,
-                              height: 50,
-                            ),
-                            const SizedBox(
-                              height: 5,
-                            ),
-                            Text('facebook')
-                          ],
+                      GestureDetector(
+                        onTap: (){
+                          print("facebook click");
+                        },
+                        child: Container(
+                          width: 110,
+                          padding: EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.white),
+                            borderRadius: BorderRadius.circular(16),
+                            color: Colors.grey[200],
+                          ),
+                          child: Column(
+                            children: [
+                              Image.asset(
+                                iconPath.appBarIcon('facebook_outline'),
+                                width: 50,
+                                height: 50,
+                              ),
+                              const SizedBox(
+                                height: 5,
+                              ),
+                              Text('facebook')
+                            ],
+                          ),
                         ),
                       ),
                     ],
                   ),
-                )
+                
+                SizedBox(height: 20,)
               ],
             ),
           ),

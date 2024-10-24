@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:testbar4/services/firebase_service/Fire_User.dart';
 
 class NPSTextField extends StatelessWidget {
   final TextEditingController controller;
@@ -144,71 +145,7 @@ class WeeklyGoalTextField extends StatelessWidget {
   }
 }
 
-// for register button
-/*
-class RegisterButton extends StatelessWidget {
-  final TextEditingController emailController;
-  final TextEditingController passwordController;
 
-  const RegisterButton({
-    super.key,
-    required this.emailController,
-    required this.passwordController,
-  });
-
-  Future<void> _register(BuildContext context) async {
-    try {
-      UserCredential userCredential =
-          await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: emailController.text,
-        password: passwordController.text,
-      );
-      // Handle successful registration (e.g., navigate to another screen)
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Registration Successful')),
-      );
-    } on FirebaseAuthException catch (e) {
-      String message = '';
-      if (e.code == 'weak-password') {
-        message = 'The password provided is too weak.';
-      } else if (e.code == 'email-already-in-use') {
-        message = 'The account already exists for that email.';
-      } else {
-        message = 'An error occurred. Please try again.';
-      }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message)),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('An error occurred. Please try again.')),
-      );
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => _register(context),
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(20),
-        margin: const EdgeInsets.symmetric(horizontal: 20),
-        decoration: BoxDecoration(
-          color: Colors.black,
-          borderRadius: BorderRadius.circular(5),
-        ),
-        child: const Center(
-          child: Text(
-            'Register',
-            style: TextStyle(color: Colors.white, fontSize: 16),
-          ),
-        ),
-      ),
-    );
-  }
-}
-*/
 class RegisterButton extends StatelessWidget {
   final TextEditingController emailController;
   final TextEditingController passwordController;
@@ -260,25 +197,21 @@ class RegisterButton extends StatelessWidget {
     }
 
     try {
-      UserCredential userCredential =
-          await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-      // Handle successful registration
-      await FirebaseFirestore.instance.collection('RunnerProfile').add({
-        'id': userCredential.user!.uid,
-        'name': name,
-        'weight': double.parse(weight),
-        'height': double.parse(height),
-        'birthday': DateTime.parse(birthday),
-        'weekly_goal': int.parse(weeklyGoal),
-        'username': email,
-      });
-
+      
+      PixARTUser.registerUser(
+        email: email, 
+        password: password, 
+        name: name, 
+        weight: double.parse(weight),
+        height: double.parse(height), 
+        birthday: DateTime.parse(birthday), 
+        goal: int.parse(weeklyGoal), 
+        creatuserID: true
+        );
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Registration Successful')),
       );
+      
       // Navigate to login page after successful registration
       Navigator.pushReplacementNamed(context, '/p7');
     } on FirebaseAuthException catch (e) {

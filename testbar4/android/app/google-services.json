@@ -12,7 +12,12 @@
           "package_name": "com.testbar4.app"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "1026990396626-r1278f2fdr8u88avaqd40grl7ue7l1c5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyC_oCcHNI4ue9p1StzJSK9X_PvrjWi78tg"
@@ -20,7 +25,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1026990396626-r1278f2fdr8u88avaqd40grl7ue7l1c5.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1026990396626-ujut87r2li115pb801p949k29lj37ldn.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.testbar4"
+              }
+            }
+          ]
         }
       }
     }

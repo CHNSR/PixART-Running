@@ -49,17 +49,8 @@ class _NavbarState extends State<Navbar> {
       bottomNavigationBar: Container(
         height: 80,
         decoration: BoxDecoration(
-          /*
-          gradient: LinearGradient(
-           colors: [ Color(0xFF365314),Color(0xFF3f6212)], // ใส่สีของ Gradient
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-          ),
-          */
           color: Color(0xFFf9f4ef),
-          //borderRadius: BorderRadius.circular(10),
           border: Border(top: BorderSide(color: Color(0xFF0f0e17),width: 3)),
-          
         ),
         child: NavigationBar(
           //backgroundColor: const Color(0xFFbef264),

@@ -5,9 +5,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
-import 'package:testbar4/database/Fire_Activity.dart';
+import 'package:testbar4/services/firebase_service/Fire_Activity.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:testbar4/database/Fire_Location.dart';
+import 'package:testbar4/services/firebase_service/Fire_Location.dart';
 import 'package:testbar4/manage/manage_icon/icon_path.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 

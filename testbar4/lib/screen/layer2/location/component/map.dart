@@ -29,12 +29,12 @@ class _ShowMap2State extends State<ShowMap2> {
   Future<void> _loadCustomMarkers() async {
      final BitmapDescriptor startIcon = await BitmapDescriptor.asset(
       const ImageConfiguration(size: Size(30, 30)),
-      iconPath.appBarIcon('pin_black'),
+      iconPath.appBarIcon('pin_red'),
     );
 
     final BitmapDescriptor endIcon = await BitmapDescriptor.asset(
       const ImageConfiguration(size: Size(30, 30)),
-      iconPath.appBarIcon('pin_black'),
+      iconPath.appBarIcon('pin_green'),
     );
     
 
@@ -100,7 +100,7 @@ class _ShowMap2State extends State<ShowMap2> {
         Polyline(
           polylineId: const PolylineId('route'),
           points: latLngRoute,
-          color: Colors.red,
+          color: Color(0xFFf25042),
           width: 5,
         ),
       },

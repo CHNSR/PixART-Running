@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:testbar4/database/Fire_Challenge.dart';
+import 'package:testbar4/services/firebase_service/Fire_Challenge.dart';
 import 'package:testbar4/grobleCP/ColorPicker.dart';
 
 class AddChallengeSc extends StatefulWidget {
@@ -134,7 +134,7 @@ class _AddChallengeScState extends State<AddChallengeSc> {
                               child:  Container(
                                 height: 40,
                                 decoration: BoxDecoration(
-                                  color: Color(0xFFff8ba7),
+                                  color: Color(0xFF8bd3dd),
                                   borderRadius: BorderRadius.circular(10),
                                   border: Border.all(
                                     width: 2,
@@ -156,7 +156,7 @@ class _AddChallengeScState extends State<AddChallengeSc> {
                                   child:  Container(
                                     height: 40,
                                     decoration: BoxDecoration(
-                                    color: Color(0xFFc3f0ca),
+                                    color: Color(0xFFceff0f3),
                                     borderRadius: BorderRadius.circular(10),
                                     border: Border.all(
                                       width: 2,

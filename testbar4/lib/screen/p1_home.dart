@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:testbar4/database/Fire_Activity.dart';
 import 'package:testbar4/manage/manage_icon/icon_path.dart';
 import 'package:testbar4/screen/layer2/activity/componente/activityCP.dart';
+import 'package:testbar4/screen/layer2/gauges/gauges.dart';
 import 'package:testbar4/screen/layer2/heatmap/heatmapCP.dart';
 
 class P1Home extends StatefulWidget {
@@ -28,6 +27,8 @@ class _P1HomeState extends State<P1Home> {
                 const SizedBox(height: 20),
                 const CircleAvatar(
                   radius: 100,
+                  backgroundColor: Color(0xFFeaddcf),
+                  child: WeeklyGoalGauges(),
                 ),
                 const SizedBox(height: 20),
                 Container(
@@ -118,9 +119,11 @@ class _P1HomeState extends State<P1Home> {
                       const SizedBox(
                         height: 10,
                       ),
+                      
                       Container(
-                        margin: const EdgeInsets.all(8.0),
-                        child: HeatmapCP())
+                          margin: const EdgeInsets.all(8.0),
+                          child:  HeatmapCP(),
+                      ),
                     ],
                   ),
                 ),

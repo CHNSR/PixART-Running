@@ -3,7 +3,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:testbar4/database/Fire_Activity.dart';
+import 'package:testbar4/services/firebase_service/Fire_Activity.dart';
 import 'package:testbar4/login/p1_intro.dart';
 import 'package:testbar4/login/p2_login.dart';
 import 'package:testbar4/login/p3_register.dart';
@@ -21,7 +21,7 @@ import 'package:testbar4/screen/layer2/shose/shoes.dart';
 import 'package:testbar4/screen/p1_home.dart';
 import 'package:testbar4/screen/p2_location.dart';
 import 'package:testbar4/screen/p3_run.dart';
-import 'package:testbar4/screen/p5-child/edite_profile.dart';
+import 'package:testbar4/screen/layer2/p5-child/edite_profile.dart';
 import 'package:testbar4/screen/p5_profile.dart';
 import 'package:provider/provider.dart';
 
@@ -86,17 +86,11 @@ class AuthCheck extends StatelessWidget {
               child:
                   CircularProgressIndicator()); // รอการตรวจสอบสถานะการเข้าสู่ระบบ
         } else if (snapshot.hasData) {
-          /*// เช็คสถานะการเข้าสู่ระบบ
-          if (Activity.runnerID == null) {
-            Activity.initialize(context);
-          }
-          */
-          return Navbar(); // if user is logged in
+          return Navbar(); // if user is login
         } else {
-          return P1Intro(); // if user is not logged in
+          return P1Intro(); // if user isn't login
         }
       },
     );
   }
 }
-
