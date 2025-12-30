@@ -8,36 +8,68 @@
 .buildlog/
 .history
 .svn/
-migrate_working_dir/
 
-# IntelliJ related
+# IntelliJ
 *.iml
 *.ipr
 *.iws
 .idea/
 
-# The .vscode folder contains launch configuration and tasks you configure in
-# VS Code which you may wish to be included in version control, so this line
-# is commented out by default.
-#.vscode/
+# VS Code
+.vscode/
 
-# Flutter/Dart/Pub related
-**/doc/api/
-**/ios/Flutter/.last_build_id
+# Flutter/Dart/Pub
 .dart_tool/
 .flutter-plugins
 .flutter-plugins-dependencies
+.packages
+build/
 .pub-cache/
 .pub/
-/build/
 
-# Symbolication related
-app.*.symbols
+# Android
+android/key.properties
+android/local.properties
+android/generated/
+android/app/generated/
+android/.gradle
+android/captures/
+android/gradle/wrapper/gradle-wrapper.jar
+android/app/src/main/assets/
 
-# Obfuscation related
-app.*.map.json
+# iOS
+ios/.generated/
+ios/Flutter/Generated.xcconfig
+ios/Flutter/flutter_export_environment.sh
+ios/Flutter/app.flx
+ios/Flutter/app.zip
+ios/Flutter/fonts/
+ios/Flutter/start_up_info.json
+ios/ServiceDefinitions.json
+ios/Runner/GeneratedPluginRegistrant.*
 
-# Android Studio will place build artifacts here
-/android/app/debug
-/android/app/profile
-/android/app/release
+# Windows
+windows/flutter/generated_plugin_registrant.cc
+windows/flutter/generated_plugin_registrant.h
+windows/runner/resources/app_icon.ico
+
+# MacOS
+macos/Flutter/generated_plugin_registrant.swift
+
+# Web
+web/icons/
+web/favicon.png
+web/manifest.json
+
+# API Keys and Secrets / Environment Variables
+.env
+.env.*
+*.env
+env/
+lib/api_keys.dart
+lib/secrets.dart
+lib/config/api_config.dart
+google-services.json
+GoogleService-Info.plist
+firebase_options.dart
+lib/firebase_options.dart

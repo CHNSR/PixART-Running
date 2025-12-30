@@ -1,0 +1,59 @@
+ .vscode/settings.json                              |   3 [32m+[m
+ testbar4/.gitignore                                |  68 [32m++[m[31m-[m
+ testbar4/android/app/build.gradle                  |   4 [32m+[m[31m-[m
+ .../gradle/wrapper/gradle-wrapper.properties       |   2 [32m+[m[31m-[m
+ testbar4/android/settings.gradle                   |   6 [32m+[m[31m-[m
+ testbar4/lib/database/Fire_UserChallenge.dart      |  71 [31m---[m
+ testbar4/lib/main.dart                             |  69 [32m+[m[31m--[m
+ .../lib/{model => provider}/provider_userData.dart |  17 [32m+[m[31m-[m
+ testbar4/lib/routes/export.dart                    |  53 [32m+++[m
+ .../{manage/manage_icon => routes}/icon_path.dart  |   0
+ testbar4/lib/routes/routes.dart                    |  66 [32m+++[m
+ .../layer2/activity/componente/acCpEdit.dart       | 193 [31m--------[m
+ .../lib/screen/layer2/p4-child/addcontanceSC.dart  | 508 [31m--------------------[m
+ testbar4/lib/screen/p2_location.dart               |  76 [31m---[m
+ .../guest}/login/components/login_compponents.dart |  86 [32m++[m[31m--[m
+ .../login/components/register_compponents.dart     |   0
+ .../lib/{ => screens/guest}/login/p1_intro.dart    |   2 [32m+[m[31m-[m
+ .../lib/{ => screens/guest}/login/p2_login.dart    |  14 [32m+[m[31m-[m
+ .../lib/{ => screens/guest}/login/p3_register.dart |   4 [32m+[m[31m-[m
+ .../{ => screens/guest}/login/p4_forgetpass.dart   |   0
+ .../guest}/login/p5_aftersign_inwithG.dart         |   0
+ .../layer2/activity/activity.dart                  |   9 [32m+[m[31m-[m
+ .../layer2/activity/componente/acCpEdit.dart       | 199 [32m++++++++[m
+ .../layer2/activity/componente/activityCP.dart     |  34 [32m+[m[31m-[m
+ .../layer2/heatmap/heatmapCP.dart                  |  36 [32m+[m[31m-[m
+ .../layer2/location/component/addlocation.dart     |  28 [32m+[m[31m-[m
+ .../layer2/location/component/card.dart            |  62 [32m+[m[31m--[m
+ .../layer2/location/component/editlocation.dart    |  58 [32m+[m[31m--[m
+ .../layer2/location/component/map.dart             |   9 [32m+[m[31m-[m
+ .../layer2/location/moreinfoMap.dart               |   0
+ .../layer2/location/navigation.dart                | 513 [32m+++++++++++[m[31m----------[m
+ .../lib/screens/layer2/p4-child/addcontanceSC.dart | 483 [32m+++++++++++++++++++[m
+ .../layer2/p4-child/cardswiper.dart                |  61 [32m++[m[31m-[m
+ .../layer2/p4-child/component.dart                 | 112 [32m+++[m[31m--[m
+ .../layer2/selectShoes/selectShoes.dart            | 117 [32m++[m[31m---[m
+ .../{screen => screens}/layer2/shose/addshoes.dart |   4 [32m+[m[31m-[m
+ .../layer2/shose/components/addshoescomP.dart      |   2 [32m+[m[31m-[m
+ .../layer2/shose/components/shoescomP.dart         |   6 [32m+[m[31m-[m
+ .../{screen => screens}/layer2/shose/shoes.dart    |  14 [32m+[m[31m-[m
+ testbar4/lib/{screen => screens}/p1_home.dart      |  13 [32m+[m[31m-[m
+ testbar4/lib/screens/p2_location.dart              |  72 [32m+++[m
+ testbar4/lib/{screen => screens}/p3_run.dart       | 308 [32m+++++++[m[31m------[m
+ testbar4/lib/{screen => screens}/p4_plan.dart      |  32 [32m+[m[31m-[m
+ .../p5-child/CPediteprofile.dart                   |  15 [32m+[m[31m-[m
+ .../p5-child/edite_profile.dart                    |  11 [32m+[m[31m-[m
+ testbar4/lib/{screen => screens}/p5_profile.dart   | 409 [32m++++++++[m[31m--------[m
+ .../lib/{database => services}/Fire_Activity.dart  |   0
+ .../lib/{database => services}/Fire_Challenge.dart |   0
+ .../lib/{database => services}/Fire_Location.dart  |   0
+ .../lib/{database => services}/Fire_Shoes.dart     |   0
+ testbar4/lib/{database => services}/Fire_User.dart |   8 [32m+[m[31m-[m
+ testbar4/lib/services/Fire_UserChallenge.dart      |  73 [32m+++[m
+ .../lib/{database => services}/Fire_Visit.dart     |   0
+ .../lib/{grobleCP => widgets}/ColorPicker.dart     |   0
+ testbar4/lib/{ => widgets}/navbar.dart             |  20 [32m+[m[31m-[m
+ .../macos/Flutter/GeneratedPluginRegistrant.swift  |   2 [32m+[m
+ testbar4/pubspec.lock                              | 510 [32m++++++++++[m[31m----------[m
+ testbar4/pubspec.yaml                              |  26 [32m+[m[31m-[m
+ 58 files changed, 2357 insertions(+), 2131 deletions(-)

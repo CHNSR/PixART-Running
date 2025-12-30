@@ -1,29 +1,10 @@
-
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:testbar4/database/Fire_Activity.dart';
-import 'package:testbar4/login/p1_intro.dart';
-import 'package:testbar4/login/p2_login.dart';
-import 'package:testbar4/login/p3_register.dart';
-import 'package:testbar4/login/p4_forgetpass.dart';
-import 'package:testbar4/model/provider_userData.dart';
-import 'package:testbar4/navbar.dart';
-import 'package:testbar4/screen/layer2/activity/activity.dart';
-import 'package:testbar4/screen/layer2/activity/componente/acCpEdit.dart';
-import 'package:testbar4/screen/layer2/activity/componente/activityCP.dart';
-import 'package:testbar4/screen/layer2/location/component/addlocation.dart';
-import 'package:testbar4/screen/layer2/location/component/editlocation.dart';
-import 'package:testbar4/screen/layer2/location/navigation.dart';
-import 'package:testbar4/screen/layer2/shose/addshoes.dart';
-import 'package:testbar4/screen/layer2/shose/shoes.dart';
-import 'package:testbar4/screen/p1_home.dart';
-import 'package:testbar4/screen/p2_location.dart';
-import 'package:testbar4/screen/p3_run.dart';
-import 'package:testbar4/screen/p5-child/edite_profile.dart';
-import 'package:testbar4/screen/p5_profile.dart';
 import 'package:provider/provider.dart';
+import 'package:testbar4/provider/provider_userData.dart';
+import 'package:testbar4/routes/routes.dart';
+import 'package:testbar4/routes/export.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -31,7 +12,6 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [ChangeNotifierProvider(create: (_) => UserDataPV())],
-      
       child: const Nav(),
     ),
   );
@@ -39,40 +19,17 @@ void main() async {
 
 class Nav extends StatelessWidget {
   const Nav({super.key});
-  
+
   @override
-  
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: AuthCheck(),
-      //trun off debug tag
       debugShowCheckedModeBanner: false,
-      initialRoute: '/',
-
-      routes: {
-        '/main': (context) => Navbar(),
-        '/p1': (context) => P1Home(),
-        '/p2': (context) => P2Location(),
-        '/p3': (context) => P3Run(),
-        '/p4': (context) => P4Forgetpass(),
-        '/p5': (context) => P5Profile(),
-        '/p6': (context) => P1Intro(),
-        '/p7': (context) => P2Login(),
-        '/p8': (context) => P3Register(),
-        '/p9': (context) => P4Forgetpass(),
-        '/p10': (context) => EditeProfile(),
-        '/p11': (context) => Shoes(),
-        '/p12': (context) => Addshoes(),
-        '/p13': (context) => ActivityPage(),
-        //'/p14': (context) => AddLocationPageMap(),
-        '/p15': (context) => EditlocationPage(),
-        
-      },
+      initialRoute: Routes.initial,
+      onGenerateRoute: Routes.onGenerateRoute,
     );
   }
 }
 
-// this class will check user login?
 class AuthCheck extends StatelessWidget {
   const AuthCheck({super.key});
 
@@ -82,21 +39,13 @@ class AuthCheck extends StatelessWidget {
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(
-              child:
-                  CircularProgressIndicator()); // รอการตรวจสอบสถานะการเข้าสู่ระบบ
+          return const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasData) {
-          /*// เช็คสถานะการเข้าสู่ระบบ
-          if (Activity.runnerID == null) {
-            Activity.initialize(context);
-          }
-          */
-          return Navbar(); // if user is logged in
+          return Navbar();
         } else {
-          return P1Intro(); // if user is not logged in
+          return P1Intro();
         }
       },
     );
   }
 }
-
