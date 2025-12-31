@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:testbar4/services/firebase_service/Fire_User.dart';
@@ -23,7 +24,7 @@ class EditeProfileButton extends StatelessWidget {
     required this.weeklyGoalController, 
   });
 
-  Future<void> _update(BuildContext context) async {
+ Future<void> _update(BuildContext context) async {
     final userProvider = Provider.of<UserDataPV>(context, listen: false);
 
     final email = emailController.text.isNotEmpty
@@ -42,7 +43,9 @@ class EditeProfileButton extends StatelessWidget {
     
     final birthday = birthdayController.text.isNotEmpty
         ? DateTime.tryParse(birthdayController.text)
-        : userProvider.userData?['birthday'];
+        : (userProvider.userData?['birthday'] is Timestamp
+            ? (userProvider.userData?['birthday'] as Timestamp).toDate()
+            : userProvider.userData?['birthday']);
         
     final weeklyGoal = weeklyGoalController.text.isNotEmpty
         ? int.tryParse(weeklyGoalController.text)
@@ -88,12 +91,14 @@ class EditeProfileButton extends StatelessWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Profile updated successfully.')),
       );
-      } catch (e) {
+    } catch (e) {
+      print("[Edit Profile] Error => $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to update profile.')),
       );
     }
   }
+
 
   @override
   Widget build(BuildContext context) {

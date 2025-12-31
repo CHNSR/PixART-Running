@@ -3,18 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:testbar4/screen/layer2/p5-child/profilePick.dart';
 import 'package:testbar4/services/firebase_service/Fire_Activity.dart';
-import 'package:testbar4/services/firebase_service/Fire_User.dart';
 import 'package:testbar4/manage/manage_icon/icon_path.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:testbar4/model/provider_userData.dart';
-import 'package:image_picker/image_picker.dart';
-import 'dart:io';
 
-import '../manage/userprofile/user_path.dart';  
+import '../manage/userprofile/user_path.dart';
 
 class P5Profile extends StatefulWidget {
   P5Profile({super.key});
- 
 
   @override
   State<P5Profile> createState() => _P5ProfileState();
@@ -30,11 +25,9 @@ class _P5ProfileState extends State<P5Profile> {
   String? bestDurationdate;
   String? distance;
   String? distancedate;
-  String? totaldistance = '0.0' ;
+  String? totaldistance = '0.0';
   String? totalAVGpace;
-  String? totalHouse; 
-
-  
+  String? totalHouse;
 
   @override
   void initState() {
@@ -52,7 +45,6 @@ class _P5ProfileState extends State<P5Profile> {
     totaldistance = await fetchandDisplayTotalKM();
     totalAVGpace = await fetchAndDisPlayTotalPace();
     totalHouse = await fetchandDisplayTotalHouse();
-
 
     setState(() {}); // Notify the widget to rebuild with the new data
   }
@@ -84,28 +76,27 @@ class _P5ProfileState extends State<P5Profile> {
     return 'null';
   }
 
-  static Future<String> fetchAndDisPlayTotalPace() async{
+  static Future<String> fetchAndDisPlayTotalPace() async {
     final data = await Activity.fetchTotalAveragePace();
-    if(data != 0.0){
+    if (data != 0.0) {
       return data.toStringAsFixed(2);
     }
     return 'None';
-      
   }
 
- static Future<String> fetchandDisplayTotalKM() async {
-  final data = await Activity.fetchTotalDistance();
-  if (data != 0.0) {
-    // แปลงจากเมตรเป็นกิโลเมตร
-    final distanceInKM = data / 1000;
-    return distanceInKM.toStringAsFixed(2);
+  static Future<String> fetchandDisplayTotalKM() async {
+    final data = await Activity.fetchTotalDistance();
+    if (data != 0.0) {
+      // แปลงจากเมตรเป็นกิโลเมตร
+      final distanceInKM = data / 1000;
+      return distanceInKM.toStringAsFixed(2);
+    }
+    return 'None';
   }
-  return 'None';
-}
 
-  static Future<String> fetchandDisplayTotalHouse() async{
+  static Future<String> fetchandDisplayTotalHouse() async {
     final data = await Activity.fetchTotalHouse();
-    if(data != "00:00:00"){
+    if (data != "00:00:00") {
       return data;
     }
     return data;
@@ -118,22 +109,20 @@ class _P5ProfileState extends State<P5Profile> {
     // Reset the provider state by calling a method to clear user data
     Provider.of<UserDataPV>(context, listen: false).clearUserData();
 
-      // Reset runnerID in the Activity class
+    // Reset runnerID in the Activity class
     Activity.runnerID = null;
-    
+
     print('Logout successful');
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text("Logout Successful",
-          style: TextStyle(
-            color: Colors.white
-          ),
+        content: Text(
+          "Logout Successful",
+          style: TextStyle(color: Colors.white),
         ),
         duration: Duration(seconds: 3),
-        shape: Border.all(width: 1,color: Color(0xFF020826)),
+        shape: Border.all(width: 1, color: Color(0xFF020826)),
         backgroundColor: Color(0xFFf25042),
-      
       ),
     );
 
@@ -141,432 +130,475 @@ class _P5ProfileState extends State<P5Profile> {
     Navigator.pushNamed(context, '/p7');
   }
 
-
   @override
   Widget build(BuildContext context) {
-    
     return Consumer<UserDataPV>(builder: (context, userDataProvider, child) {
       final userData = userDataProvider.userData;
       print("[P5]-------------------------${userData}------------------");
       final name = userData?['name'] ?? 'error';
-      return Scaffold(
-        backgroundColor: const Color(0xFFf9f4ef),
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(10),
-            child: Column(
-              children: [
-                Container(
-                  alignment: Alignment.center,
-                  child: const Text(
-                    'Profile',
-                    style: TextStyle(fontSize: 20),
-                  ),
-                ),
-                const SizedBox(
-                  height: 20.0,
-                ),
-                /*
-                Center(
-                  child: CircleAvatar(
-                    radius: 50,
-                    backgroundColor: Colors.white,
-                    child: Image.asset(iconPath.appBarIcon("userprofile_defult")),
-                  ),
-                ),
-                */
-                 GestureDetector(
-                  onTap: () {
-                    // เมื่อกด CircleAvatar จะนำไปหน้า Profilepick
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const Profilepick()),
-                    );
-                  },
-                  child: Center(
+      final profile_pic = userData?['profile_pic'] ?? 'default';
+      final weeklygoal = userData?['weekly_goal'] ?? '-';
+      final runnerID = userData?['id'] ?? '-';
+
+      return FutureBuilder(
+        future: Activity.fetchNumOfWeeklyActivity(runnerID),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const CircularProgressIndicator(); // กำลังโหลดข้อมูล
+          } else if (snapshot.hasError) {
+            return Text("Error: ${snapshot.error}"); // แสดง error ถ้ามี
+          } else {
+            final weeklyActivity = snapshot.data ?? '-';
+
+            return Scaffold(
+              backgroundColor: const Color(0xFFf9f4ef),
+              body: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Column(
+                    children: [
+                      Container(
+                        alignment: Alignment.center,
+                        child: const Text(
+                          'Profile',
+                          style: TextStyle(fontSize: 20),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 20.0,
+                      ),
+                      /*
+                  Center(
                     child: CircleAvatar(
                       radius: 50,
                       backgroundColor: Colors.white,
-                      child: Image.asset(
-                        userProfile.userProfileImg("userprofile_defult"),
-                        fit: BoxFit.cover,
-                      ),
+                      child: Image.asset(iconPath.appBarIcon("userprofile_defult")),
                     ),
                   ),
-                ),
-                const SizedBox(height: 20),
-                Center(
-                  child: Text(
-                    name,
-                    style: const TextStyle(
-                        fontSize: 20, fontWeight: FontWeight.w400),
-                  ),
-                ),
-                const SizedBox(height: 30),
-                const Divider(),
-                Container(
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: ListTile(
-                          leading: Image.asset(
-                            iconPath.appBarIcon('setting_outline'),
-                            height: 40,
-                            width: 40,
-                          ),
-                          title: Text('Edite Profile'),
-                          subtitle: Text(
-                              FirebaseAuth.instance.currentUser?.email ??
-                                  "unknow"),
-                        ),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.chevron_right_outlined),
-                        onPressed: () {
-                          Navigator.pushNamed(
-                              context, '/p10'); // Replace with your route name
+                  */
+                      GestureDetector(
+                        onTap: () {
+                          // เมื่อกด CircleAvatar จะนำไปหน้า Profilepick
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const Profilepick()),
+                          );
                         },
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                //logout
-                GestureDetector(
-                  onTap: () {
-                    Navigator.pushNamed(context, "/p11");
-                  },
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: ListTile(
-                          leading: Image.asset(
-                            iconPath.appBarIcon('shoes_outline'),
-                            width: 40,
-                            height: 40,
+                        child: Center(
+                          child: CircleAvatar(
+                            radius: 50,
+                            backgroundColor: Colors.white,
+                            child: Image.asset(
+                              profile_pic,
+                              fit: BoxFit.cover,
+                            ),
                           ),
-                          title: const Text('My Shoes'),
-                          //subtitle: Text('chanonsukrod@gmail.com'),
                         ),
                       ),
-                    ],
-                  ),
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                GestureDetector(
-                  onTap: () => _logout(context),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: ListTile(
-                          leading: Image.asset(
-                            iconPath.appBarIcon('logout_outline'),
-                            width: 40,
-                            height: 40,
-                          ),
-                          title: const Text('Logout'),
-                          
+                      const SizedBox(height: 20),
+                      Center(
+                        child: Text(
+                          name,
+                          style: const TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.w400),
                         ),
                       ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Padding(
-                  padding: const EdgeInsets.all(2.0),
-                  child: Container(
-                    width: 400,
-                    //height: 400,
-                    decoration: BoxDecoration(
-                      color: Color(0xFFeaddcf),
-                      borderRadius: BorderRadius.circular(5),
-                      border: Border.all(width: 2,
-                        color: Colors.black
-                      )  
-                    ),
-                        
-                    child: Column(
-                      children: [
-                        const ListTile(
-                          leading: Icon(Icons.run_circle_outlined),
-                          title: Text(
-                            'My progress',
-                            style: TextStyle(fontSize: 20),
-                          ),
-                        ),
-                        ListTile(
-                          title: Text(
-                            totaldistance!,
-                            style: const TextStyle(fontSize: 45),
-                          ),
-                          subtitle: const Text('Total Km',style: TextStyle(fontSize: 30),),
-                        ),
-                        Container(margin: const EdgeInsets.all(8), child: const Divider(color: Colors.grey,)),
-                        Row(
+                      const SizedBox(height: 30),
+                      const Divider(),
+                      Container(
+                        child: Row(
                           children: [
                             Expanded(
                               child: ListTile(
-                                title: Expanded(child: Text(totalHouse!,style: const TextStyle(fontSize: 22),)),
-                                subtitle: const Text("Total Hour",style: TextStyle(fontSize: 20),),
-                              )
+                                leading: Image.asset(
+                                  iconPath.appBarIcon('setting_outline'),
+                                  height: 40,
+                                  width: 40,
+                                ),
+                                title: Text('Edite Profile'),
+                                subtitle: Text(
+                                    FirebaseAuth.instance.currentUser?.email ??
+                                        "unknow"),
+                              ),
                             ),
-                            Expanded(
-                              child: ListTile(
-                                title: Text("2/3",style: TextStyle(fontSize: 25),),
-                                subtitle: Text("Weekly goal",style: TextStyle(fontSize: 20),),
-                              )
+                            IconButton(
+                              icon: const Icon(Icons.chevron_right_outlined),
+                              onPressed: () {
+                                Navigator.pushNamed(context,
+                                    '/p10'); // Replace with your route name
+                              },
                             ),
-                            Expanded(
-                              child: ListTile(
-                                title: Text(totalAVGpace!,style: const TextStyle(fontSize: 25),),
-                                subtitle: const Text('AVG pace',style: TextStyle(fontSize: 20),),
-                              )
-                            ),
-                            
                           ],
                         ),
-                        const SizedBox(height: 10,)
-                      ],
-                    ),
-                  ),
-                ),
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      //logout
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pushNamed(context, "/p11");
+                        },
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: ListTile(
+                                leading: Image.asset(
+                                  iconPath.appBarIcon('shoes_outline'),
+                                  width: 40,
+                                  height: 40,
+                                ),
+                                title: const Text('My Shoes'),
+                                //subtitle: Text('chanonsukrod@gmail.com'),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      GestureDetector(
+                        onTap: () => _logout(context),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: ListTile(
+                                leading: Image.asset(
+                                  iconPath.appBarIcon('logout_outline'),
+                                  width: 40,
+                                  height: 40,
+                                ),
+                                title: const Text('Logout'),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      Padding(
+                        padding: const EdgeInsets.all(2.0),
+                        child: Container(
+                          width: 400,
+                          //height: 400,
+                          decoration: BoxDecoration(
+                              color: Color(0xFFeaddcf),
+                              borderRadius: BorderRadius.circular(5),
+                              border:
+                                  Border.all(width: 2, color: Colors.black)),
 
-                //best reccord
-                const SizedBox(height: 20),
-                Padding(
-                padding: const EdgeInsets.all(2.0),
-                child: SizedBox(
-                  width: 400,
-                  height: 450,
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: Color(0xFFeaddcf),
-                      borderRadius: BorderRadius.circular(5),
-                      border: Border.all(width: 2,
-                        color: Colors.black
-                      )  
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start, // จัดแนวลูก widget ไปที่จุดเริ่มต้น
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(8.0),
-                          child: const Text(
-                            "Best record",
-                            style: TextStyle(
-                              fontSize: 25,
-                              fontWeight: FontWeight.bold,
+                          child: Column(
+                            children: [
+                              const ListTile(
+                                leading: Icon(Icons.run_circle_outlined),
+                                title: Text(
+                                  'My progress',
+                                  style: TextStyle(fontSize: 20),
+                                ),
+                              ),
+                              ListTile(
+                                title: Text(
+                                  totaldistance!,
+                                  style: const TextStyle(fontSize: 45),
+                                ),
+                                subtitle: const Text(
+                                  'Total Km',
+                                  style: TextStyle(fontSize: 30),
+                                ),
+                              ),
+                              Container(
+                                  
+                                  margin: const EdgeInsets.all(8),
+                                  child: const Divider(
+                                    color: Colors.grey,
+                                  )),
+                              Row(
+                                children: [
+                                  Expanded(
+                                      child: ListTile(
+                                    title: Expanded(
+                                        child: Text(
+                                      totalHouse!,
+                                      style: const TextStyle(fontSize: 22),
+                                    )),
+                                    subtitle: const Text(
+                                      "Total Hour",
+                                      style: TextStyle(fontSize: 20),
+                                    ),
+                                  )),
+                                  Expanded(
+                                      child: ListTile(
+                                    title: Text(
+                                      "$weeklyActivity/$weeklygoal",
+                                      style: TextStyle(fontSize: 25),
+                                    ),
+                                    subtitle: Text(
+                                      "Weekly goal",
+                                      style: TextStyle(fontSize: 20),
+                                    ),
+                                  )),
+                                  Expanded(
+                                      child: ListTile(
+                                    title: Text(
+                                      totalAVGpace!,
+                                      style: const TextStyle(fontSize: 25),
+                                    ),
+                                    subtitle: const Text(
+                                      'AVG pace',
+                                      style: TextStyle(fontSize: 20),
+                                    ),
+                                  )),
+                                ],
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      //best reccord
+                      const SizedBox(height: 20),
+                      Padding(
+                        padding: const EdgeInsets.all(2.0),
+                        child: SizedBox(
+                          width: 400,
+                          height: 450,
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                                color: Color(0xFFeaddcf),
+                                borderRadius: BorderRadius.circular(5),
+                                border:
+                                    Border.all(width: 2, color: Colors.black)),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment
+                                  .start, // จัดแนวลูก widget ไปที่จุดเริ่มต้น
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: const Text(
+                                    "Best record",
+                                    style: TextStyle(
+                                      fontSize: 25,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                // ระยะทางที่ยาวที่สุด
+                                Flexible(
+                                  child: bestRecCard(
+                                    iconPath: 'distance_outline',
+                                    title: 'LONGEST DISTANCE',
+                                    result: distance ?? '0.0', // ให้ค่าเริ่มต้น
+                                    unit: 'KM',
+                                    datetime: distancedate ??
+                                        'Loading...', // ให้ค่าเริ่มต้น
+                                    trailingColor: Color(0xFF0c4a6e),
+                                  ),
+                                ),
+                                // ความเร็วที่ดีที่สุด
+                                Flexible(
+                                  child: bestRecCard(
+                                    iconPath: 'fast_outline',
+                                    title: 'BEST PACE',
+                                    result:
+                                        bestAVGpace ?? '0.0', // ให้ค่าเริ่มต้น
+                                    unit: 'Pace',
+                                    datetime: bestAVGpacedate ??
+                                        'Loading...', // ให้ค่าเริ่มต้น
+                                    trailingColor: Color(0xFFf25042),
+                                  ),
+                                ),
+                                // ระยะเวลาที่ยาวที่สุด
+                                Flexible(
+                                  child: bestRecCard(
+                                    iconPath: "clock_outline",
+                                    title: "BEST DURATION",
+                                    result:
+                                        bestDuration ?? '0.0', // ให้ค่าเริ่มต้น
+                                    unit: "Hour",
+                                    datetime: bestDurationdate ??
+                                        'Loading...', // ให้ค่าเริ่มต้น
+                                    trailingColor: Color(0xFF8c7851),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
-                        const SizedBox(height: 2),
-                        // ระยะทางที่ยาวที่สุด
-                        Flexible(
-                          child: bestRecCard(
-                            iconPath: 'distance_outline',
-                            title: 'LONGEST DISTANCE',
-                            result: distance ?? '0.0', // ให้ค่าเริ่มต้น
-                            unit: 'KM',
-                            datetime: distancedate ?? 'Loading...', // ให้ค่าเริ่มต้น
-                            trailingColor: Color(0xFF0c4a6e),
+                      ),
+
+                      //Fastest times
+                      const SizedBox(height: 20),
+                      Padding(
+                        padding: const EdgeInsets.all(2.0),
+                        child: Container(
+                          width: 400,
+                          height: 650,
+                          decoration: BoxDecoration(
+                              color: Color(0xFFeaddcf),
+                              borderRadius: BorderRadius.circular(5),
+                              border:
+                                  Border.all(width: 2, color: Colors.black)),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                  padding: const EdgeInsets.all(8.0),
+                                  alignment: Alignment.topLeft,
+                                  child: const Text(
+                                    "Fastest times",
+                                    style: TextStyle(
+                                        fontSize: 25,
+                                        fontWeight: FontWeight.bold),
+                                  )),
+                              const SizedBox(
+                                height: 2,
+                              ),
+
+                              cardWidget(
+                                imgName: 'best_outline',
+                                title: 'BEST 400M',
+                                distanceM: 400,
+                                trailingColor: Color(0xFF0c4a6e),
+                              ),
+                              //call card func
+                              cardWidget(
+                                imgName: 'best_outline',
+                                title: 'BEST 1K',
+                                distanceM: 1000,
+                                trailingColor: Color(0xFF0c4a6e),
+                              ),
+                              cardWidget(
+                                imgName: 'best_outline',
+                                title: 'BEST 2K',
+                                distanceM: 2000,
+                                trailingColor: Color(0xFF0c4a6e),
+                              ),
+                              cardWidget(
+                                imgName: 'best_outline',
+                                title: 'BEST 5K',
+                                distanceM: 5000,
+                                trailingColor: Color(0xFF0c4a6e),
+                              ),
+                              cardWidget(
+                                imgName: 'best_outline',
+                                title: 'BEST 10K',
+                                distanceM: 10000,
+                                trailingColor: Color(0xFF0c4a6e),
+                              ),
+                              cardWidget(
+                                imgName: 'best_outline',
+                                title: 'BEST 21K',
+                                distanceM: 21000,
+                                trailingColor: Color(0xFF0c4a6e),
+                              ),
+                              cardWidget(
+                                imgName: 'best_outline',
+                                title: 'BEST 42K',
+                                distanceM: 42000,
+                                trailingColor: Color(0xFF0c4a6e),
+                              ),
+                            ],
                           ),
                         ),
-                        // ความเร็วที่ดีที่สุด
-                        Flexible(
-                          child: bestRecCard(
-                            iconPath: 'fast_outline',
-                            title: 'BEST PACE',
-                            result: bestAVGpace ?? '0.0', // ให้ค่าเริ่มต้น
-                            unit: 'Pace',
-                            datetime: bestAVGpacedate ?? 'Loading...', // ให้ค่าเริ่มต้น
-                            trailingColor: Color(0xFFf25042),
-                          ),
-                        ),
-                        // ระยะเวลาที่ยาวที่สุด
-                        Flexible(
-                          child: bestRecCard(
-                            iconPath: "clock_outline",
-                            title: "BEST DURATION",
-                            result: bestDuration ?? '0.0', // ให้ค่าเริ่มต้น
-                            unit: "Hour",
-                            datetime: bestDurationdate ?? 'Loading...', // ให้ค่าเริ่มต้น
-                            trailingColor: Color(0xFF8c7851),
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),
-
-
-                //Fastest times
-                const SizedBox(height: 20),
-                Padding(
-                  padding: const EdgeInsets.all(2.0),
-                  child: Container(
-                    width: 400,
-                    height: 650,
-                    decoration: BoxDecoration(
-                      color: Color(0xFFeaddcf),
-                      borderRadius: BorderRadius.circular(5),
-                      border: Border.all(width: 2,
-                        color: Colors.black
-                      )  
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        
-                        Container(
-                            padding: const EdgeInsets.all(8.0),
-                            alignment: Alignment.topLeft,
-                            child: const Text(
-                              "Fastest times",
-                              style: TextStyle(
-                                  fontSize: 25, fontWeight: FontWeight.bold),
-                            )),
-                        const SizedBox(
-                          height: 2,
-                        ),
-
-                        cardWidget(
-                          imgName: 'best_outline',
-                          title: 'BEST 400M',
-                          distanceM: 400,
-                          trailingColor: Color(0xFF0c4a6e),
-                        ),
-                        //call card func
-                        cardWidget(
-                          imgName: 'best_outline',
-                          title: 'BEST 1K',
-                          distanceM: 1000,
-                          trailingColor: Color(0xFF0c4a6e),
-                        ),
-                        cardWidget(
-                          imgName: 'best_outline',
-                          title: 'BEST 2K',
-                          distanceM: 2000,
-                          trailingColor: Color(0xFF0c4a6e),
-                        ),
-                        cardWidget(
-                          imgName: 'best_outline',
-                          title: 'BEST 5K',
-                          distanceM: 5000,
-                          trailingColor: Color(0xFF0c4a6e),
-                        ),
-                        cardWidget(
-                          imgName: 'best_outline',
-                          title: 'BEST 10K',
-                          distanceM: 10000,
-                          trailingColor: Color(0xFF0c4a6e),
-                        ),
-                        cardWidget(
-                          imgName: 'best_outline',
-                          title: 'BEST 21K',
-                          distanceM: 21000,
-                          trailingColor: Color(0xFF0c4a6e),
-                        ),
-                        cardWidget(
-                          imgName: 'best_outline',
-                          title: 'BEST 42K',
-                          distanceM: 42000,
-                          trailingColor: Color(0xFF0c4a6e),
-                        ),
-                      ],
-                    ),
-                  ),
-                )
-              ],
-            ),
-          ),
-        ),
+            );
+          }
+        },
       );
     });
   }
 
   Widget cardWidget({
-  required String imgName,
-  required String title,
-  required int distanceM,
-  required Color trailingColor,
-}) {
-  // เรียกใช้ Future เพื่อดึงข้อมูลจาก fetchBestTime
-  Future<Map<String, dynamic>?> futureData = Activity.fetchBestTime(distanceM);
-  print("[P5][cardWidget] data in var futureData: $futureData");
+    required String imgName,
+    required String title,
+    required int distanceM,
+    required Color trailingColor,
+  }) {
+    // เรียกใช้ Future เพื่อดึงข้อมูลจาก fetchBestTime
+    Future<Map<String, dynamic>?> futureData =
+        Activity.fetchBestTime(distanceM);
+    print("[P5][cardWidget] data in var futureData: $futureData");
 
-  return FutureBuilder<Map<String, dynamic>?>(
-    future: futureData,
-    builder: (context, snapshot) {
-      // ตัวแปรสำหรับเก็บข้อมูล date และ AVGpace
-      String date = 'Loading...';
-      String avgPace = '...';
+    return FutureBuilder<Map<String, dynamic>?>(
+      future: futureData,
+      builder: (context, snapshot) {
+        // ตัวแปรสำหรับเก็บข้อมูล date และ AVGpace
+        String date = 'Loading...';
+        String avgPace = '...';
 
-      if (snapshot.connectionState == ConnectionState.waiting) {
-        date = 'Loading...';
-        avgPace = '...';
-      } else if (snapshot.hasError) {
-        date = 'Error loading data';
-        avgPace = 'Error';
-      } else if (snapshot.hasData && snapshot.data != null) {
-        final data = snapshot.data!;
-        date = data['date'].toString(); // ใช้ข้อมูลจาก fetchBestTime
-        avgPace = data['AVGpace'].toString();
-      } else {
-        date = 'No data available';
-        avgPace = 'No data';
-      }
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          date = 'Loading...';
+          avgPace = '...';
+        } else if (snapshot.hasError) {
+          date = 'Error loading data';
+          avgPace = 'Error';
+        } else if (snapshot.hasData && snapshot.data != null) {
+          final data = snapshot.data!;
+          date = data['date'].toString(); // ใช้ข้อมูลจาก fetchBestTime
+          avgPace = data['AVGpace'].toString();
+        } else {
+          date = 'No data available';
+          avgPace = 'No data';
+        }
 
-      return Card(
-        elevation: 4,
-        margin: const EdgeInsets.fromLTRB(6, 3, 6, 6),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(5.0),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 50,
-              height: 50,
-              margin: const EdgeInsets.fromLTRB(6, 0, 0, 0),
-              child: Image.asset(iconPath.appBarIcon(imgName),width: 40,height: 40,)
-            ),
-            Expanded(
-              child: ListTile(
-                title: Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 25,
-                    fontWeight: FontWeight.w500,
+        return Card(
+          elevation: 4,
+          margin: const EdgeInsets.fromLTRB(6, 3, 6, 6),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(5.0),
+          ),
+          child: Row(
+            children: [
+              Container(
+                  width: 50,
+                  height: 50,
+                  margin: const EdgeInsets.fromLTRB(6, 0, 0, 0),
+                  child: Image.asset(
+                    iconPath.appBarIcon(imgName),
+                    width: 40,
+                    height: 40,
+                  )),
+              Expanded(
+                child: ListTile(
+                  title: Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 25,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  subtitle: Text(
+                    date,
+                    style: const TextStyle(fontSize: 15),
                   ),
                 ),
-                subtitle: Text(
-                  date,
-                  style: const TextStyle(fontSize: 15),
+              ),
+              Container(
+                margin: const EdgeInsets.fromLTRB(0, 0, 6, 0),
+                child: Text(
+                  avgPace,
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                    color: trailingColor,
+                  ),
                 ),
               ),
-            ),
-            Container(
-              margin: const EdgeInsets.fromLTRB(0, 0, 6, 0),
-              child: Text(
-                avgPace,
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                  color: trailingColor,
-                ),
-              ),
-            ),
-          ],
-        ),
-      );
-    },
-  );
-}
+            ],
+          ),
+        );
+      },
+    );
+  }
 
   //bestRecCard func
   Widget bestRecCard({
@@ -604,11 +636,10 @@ class _P5ProfileState extends State<P5Profile> {
                 padding: const EdgeInsets.fromLTRB(24, 0, 0, 3),
                 child: Text(
                   "$result $unit",
-                  style:  TextStyle(
+                  style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
-                      color: trailingColor
-                    ),
+                      color: trailingColor),
                 ),
               )),
               Expanded(

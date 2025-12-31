@@ -1,9 +1,7 @@
-
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:testbar4/services/firebase_service/Fire_Activity.dart';
+import 'package:testbar4/login/child/forgotpassword.dart';
 import 'package:testbar4/login/p1_intro.dart';
 import 'package:testbar4/login/p2_login.dart';
 import 'package:testbar4/login/p3_register.dart';
@@ -11,11 +9,7 @@ import 'package:testbar4/login/p4_forgetpass.dart';
 import 'package:testbar4/model/provider_userData.dart';
 import 'package:testbar4/navbar.dart';
 import 'package:testbar4/screen/layer2/activity/activity.dart';
-import 'package:testbar4/screen/layer2/activity/componente/acCpEdit.dart';
-import 'package:testbar4/screen/layer2/activity/componente/activityCP.dart';
-import 'package:testbar4/screen/layer2/location/component/addlocation.dart';
 import 'package:testbar4/screen/layer2/location/component/editlocation.dart';
-import 'package:testbar4/screen/layer2/location/navigation.dart';
 import 'package:testbar4/screen/layer2/shose/addshoes.dart';
 import 'package:testbar4/screen/layer2/shose/shoes.dart';
 import 'package:testbar4/screen/p1_home.dart';
@@ -64,7 +58,7 @@ class Nav extends StatelessWidget {
         '/p11': (context) => Shoes(),
         '/p12': (context) => Addshoes(),
         '/p13': (context) => ActivityPage(),
-        //'/p14': (context) => AddLocationPageMap(),
+        '/p14': (context) => ForgotPassword(),
         '/p15': (context) => EditlocationPage(),
         
       },

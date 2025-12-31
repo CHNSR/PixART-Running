@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
@@ -9,8 +8,6 @@ import 'package:provider/provider.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
 import 'package:testbar4/services/firebase_service/Fire_Activity.dart';
 import 'package:testbar4/manage/manage_icon/icon_path.dart';
-import 'package:flutter_image_compress/flutter_image_compress.dart';
-import 'dart:typed_data';
 import 'package:flutter/services.dart';
 import 'package:testbar4/model/provider_userData.dart';
 

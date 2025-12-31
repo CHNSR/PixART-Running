@@ -89,6 +89,8 @@ class IconPath {
     "pause_outline":"assets/image/icon/pause_outline.png",
     //user profile defult
     "userprofile_defult":"assets/image/icon/userprofile_defult.png",
+    //reset
+    "reset_outline":"assets/image/icon/reset.png",
 
     
   };

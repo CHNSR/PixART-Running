@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:location/location.dart';
 import 'package:provider/provider.dart';
 import 'package:testbar4/services/firebase_service/Fire_Location.dart';
 import 'package:testbar4/model/provider_userData.dart';

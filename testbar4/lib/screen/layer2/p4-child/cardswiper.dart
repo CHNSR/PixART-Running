@@ -1,10 +1,6 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
-import 'package:provider/provider.dart';
-import 'package:testbar4/services/firebase_service/Fire_UserChallenge.dart';
-import 'package:testbar4/model/provider_userData.dart';
 
 class CardswiperCP extends StatefulWidget {
   final Function(Map<String, dynamic>) onChallengeSelected;

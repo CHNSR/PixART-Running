@@ -29,16 +29,16 @@ class PixARTUser {
        userId = userCredential.user!.uid;
       }
       
-
       // Add user data to Firestore
       await firestore.collection("RunnerProfile").doc(userId).set({
         "id": userId, // Ensure 'id' field is included for future queries
         "name": name,
         "weight": weight,
         "height": height,
-        "birthday": birthday,
+        "birthday": Timestamp.fromDate(birthday),
         "weekly_goal": goal,
         "username": email,
+        "profile_pic": "default"
       });
       
     } on FirebaseAuthException catch (e) {
@@ -116,7 +116,8 @@ class PixARTUser {
       }
 
       if (email != null && email.isNotEmpty) {
-        await user.updateEmail(email);
+        //await user.updateEmail(email);
+        await user.verifyBeforeUpdateEmail(email);
       }
 
       // Query the document to get its ID
@@ -141,11 +142,17 @@ class PixARTUser {
 
       if (updateData.isNotEmpty) {
         // Update the document with the new data
-        await firestore
-            .collection('RunnerProfile')
-            .doc(docId)
-            .update(updateData);
-        print('User profile updated successfully.');
+        final querySnapshot = await firestore
+            .collection("RunnerProfile")
+            .where("id", isEqualTo: userId)
+            .get();
+        if (querySnapshot.docs.isNotEmpty) {
+          // ดึง ID ของเอกสารที่พบแล้วอัปเดต
+          String docId = querySnapshot.docs.first.id;
+          await firestore.collection("RunnerProfile").doc(docId).update(updateData);
+        
+        }
+        
       }
     } catch (e) {
       print('Failed to update user profile: $e');
@@ -169,4 +176,53 @@ class PixARTUser {
     }
     return false;
   }
+
+  static Future<void> updateProfilePic({
+    required BuildContext context,
+    required String profilePic,
+  }) async {
+    try {
+      // ดึง userId จากผู้ใช้ที่เข้าสู่ระบบในปัจจุบัน
+      String? userId = auth.currentUser?.uid;
+      if (userId != null) {
+        // ค้นหาเอกสารที่มีฟิลด์ 'id' ตรงกับ userId
+        final querySnapshot = await firestore
+            .collection("RunnerProfile")
+            .where("id", isEqualTo: userId)
+            .get();
+
+        if (querySnapshot.docs.isNotEmpty) {
+          // ดึง ID ของเอกสารที่พบแล้วอัปเดต
+          String docId = querySnapshot.docs.first.id;
+          await firestore.collection("RunnerProfile").doc(docId).update({
+            "profile_pic": profilePic,
+          });
+
+          // แสดง Snackbar เมื่ออัปเดตสำเร็จ
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Profile picture updated successfully!",style: TextStyle(color: Colors.black),),
+            backgroundColor: Color.fromARGB(255, 82, 255, 108),
+            ),
+          );
+        } else {
+          print("Document with user ID not found.");
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("No profile found for this user.")),
+          );
+        }
+      } else {
+        print("User is not logged in.");
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Please log in to update your profile picture.")),
+        );
+      }
+    } catch (e) {
+      // แสดง Snackbar เมื่อเกิดข้อผิดพลาด
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Failed to update profile picture: $e")),
+      );
+    }
+  }
+
+ 
 }

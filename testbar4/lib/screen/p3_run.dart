@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:intl/intl.dart';
 import 'package:location/location.dart';
 import 'package:provider/provider.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
@@ -12,9 +11,7 @@ import 'package:testbar4/manage/manage_icon/icon_path.dart';
 import 'package:testbar4/model/provider_userData.dart';
 import 'package:testbar4/screen/layer2/selectShoes/selectShoes.dart';
 
-import '../manage/manage_icon/icon_path.dart';
 
-//import 'package:testbar2/model/entry.dart';
 
 class P3Run extends StatefulWidget {
   const P3Run({super.key});

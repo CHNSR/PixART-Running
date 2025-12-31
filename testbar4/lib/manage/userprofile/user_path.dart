@@ -20,8 +20,10 @@ class UserProfile{
     "vomiting":"assets/image/userProfile/vomiting.png",
     "wink":"assets/image/userProfile/wink.png",
     "wounded":"assets/image/userProfile/wounded.png",
+    "default":"assets/image/userProfile/default.png",
   };
   String userProfileImg(String key){
     return userProfilePath[key] ?? 'assets/image/icon/pic_error.png';
   }
+  
 }

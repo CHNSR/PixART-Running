@@ -1,0 +1,61 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.buildlog/
+.history
+.svn/
+migrate_working_dir/
+hs_err_pid*
+replay_pid*
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# Flutter/Dart/Pub related
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+*.lock
+*.g.dart
+*.freezed.dart
+
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+# Android Studio build artifacts
+**/android/app/debug/
+**/android/app/profile/
+**/android/app/release/
+
+# SENSITIVE FILES - API Keys, Secrets, and Configs
+*.env
+.env.*
+**/api_keys.dart
+**/firebase_options.dart
+**/local.properties
+**/key.properties
+**/google-services.json
+**/GoogleService-Info.plist
+*.jks
+*.keystore
+*.pem
+*.p12
+*.key
+
+

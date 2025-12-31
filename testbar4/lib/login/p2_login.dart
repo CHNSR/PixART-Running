@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:testbar4/login/child/ThirdpatySigin.dart';
+import 'package:testbar4/login/child/forgotpassword.dart';
 import 'package:testbar4/login/child/form.dart';
 import 'package:testbar4/login/components/login_compponents.dart';
 import 'package:testbar4/manage/manage_icon/icon_path.dart';
-import 'package:testbar4/services/auth_service/auth_service.dart';
+
 
 class P2Login extends StatelessWidget {
   P2Login({super.key});
@@ -14,7 +14,7 @@ class P2Login extends StatelessWidget {
   final passwordController = TextEditingController();
 
   final IconPath iconPath = IconPath();
-  
+  final ThirdPartySignIn thirdpatySigin = ThirdPartySignIn();
 
   @override
   Widget build(BuildContext context) {
@@ -78,9 +78,12 @@ class P2Login extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      Text(
-                        'Forgot password?',
-                        style: TextStyle(color: Colors.grey[600]),
+                      GestureDetector(
+                        onTap: () => Navigator.pushNamed(context, '/p14'),
+                        child: Text(
+                          'Forgot password?',
+                          style: TextStyle(color: Colors.grey[600]),
+                        ),
                       ),
                     ],
                   ),
@@ -153,13 +156,14 @@ class P2Login extends StatelessWidget {
                   children: [
                       GestureDetector(
                         onTap: (){
-                           Navigator.push(
+                           thirdpatySigin.loginWithGoogle();
+                          print("click sign with google");
+                          Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const RegisterwithGoogle(), // เพิ่ม MaterialPageRoute
+                              builder: (context) => const AddDataForThirdpaty(), // เพิ่ม MaterialPageRoute
                             ),
                           );
-                          print("click sign with google");
                         },
                         child: Container(
                           width: 110,
@@ -190,6 +194,13 @@ class P2Login extends StatelessWidget {
                       GestureDetector(
                         onTap: (){
                           print("facebook click");
+                          thirdpatySigin.loginWithFacebook();
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const AddDataForThirdpaty(), // เพิ่ม MaterialPageRoute
+                            ),
+                          );
                         },
                         child: Container(
                           width: 110,

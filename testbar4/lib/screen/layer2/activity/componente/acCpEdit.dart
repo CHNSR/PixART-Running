@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:location/location.dart';
 import 'package:provider/provider.dart';
 import 'package:testbar4/services/firebase_service/Fire_Activity.dart';
 import 'package:testbar4/services/firebase_service/Fire_Location.dart';

@@ -1,33 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:testbar4/model/provider_userData.dart';
 
 import '../../../manage/userprofile/user_path.dart';
-
+import '../../../services/firebase_service/Fire_User.dart';
 class Profilepick extends StatefulWidget {
   const Profilepick({super.key});
 
   @override
   State<Profilepick> createState() => _ProfilepickState();
 }
+
 class _ProfilepickState extends State<Profilepick> {
-  // ใช้ UserProfile เพื่อดึง path ของรูปภาพโปรไฟล์
   final UserProfile userProfile = UserProfile();
+  
+  // กำหนดให้ `_profilePictures` เป็นรายการของคีย์แทน path ของรูปภาพ
+  late List<String> _profileKeys;
 
-  // รูปภาพโปรไฟล์ที่เรากำหนดให้ผู้ใช้เลือก
-  late List<String> _profilePictures;
-
-  // ตัวแปรเก็บรูปภาพที่ผู้ใช้เลือก
-  String _selectedProfile = '';
+  // เก็บคีย์ของรูปที่เลือก
+  String _selectedProfileKey = '';
 
   @override
   void initState() {
     super.initState();
 
-    // ดึงเฉพาะ values จาก userProfilePath
-    _profilePictures = userProfile.userProfilePath.values.toList();
+    // ดึงคีย์ของรูปภาพทั้งหมดจาก userProfilePath
+    _profileKeys = userProfile.userProfilePath.keys.toList();
 
-    // ตรวจสอบว่ามีรูปในรายการหรือไม่
-    if (_profilePictures.isNotEmpty) {
-      _selectedProfile = _profilePictures[0];
+    // กำหนดค่าเริ่มต้นให้ _selectedProfileKey ถ้ามีรูปในรายการ
+    if (_profileKeys.isNotEmpty) {
+      _selectedProfileKey = _profileKeys[0];
     }
   }
 
@@ -39,7 +41,6 @@ class _ProfilepickState extends State<Profilepick> {
       ),
       body: Column(
         children: [
-          // แสดงรูปโปรไฟล์ที่เลือก
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
@@ -48,35 +49,37 @@ class _ProfilepickState extends State<Profilepick> {
                 const SizedBox(height: 16),
                 CircleAvatar(
                   radius: 60,
-                  backgroundImage: _selectedProfile.isNotEmpty
-                      ? AssetImage(_selectedProfile)
-                      : null,
+                  backgroundImage: AssetImage(
+                    userProfile.userProfileImg(_selectedProfileKey),
+                  ),
                 ),
               ],
             ),
           ),
           const Divider(),
-          // GridView สำหรับเลือกรูป
           Expanded(
             child: GridView.builder(
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3, // จำนวนคอลัมน์ใน Grid
+                crossAxisCount: 3,
                 mainAxisSpacing: 10,
                 crossAxisSpacing: 10,
               ),
-              itemCount: _profilePictures.length,
+              itemCount: _profileKeys.length,
               itemBuilder: (context, index) {
+                String key = _profileKeys[index];
                 return GestureDetector(
                   onTap: () {
                     setState(() {
-                      _selectedProfile = _profilePictures[index];
+                      _selectedProfileKey = key;
                     });
                   },
                   child: CircleAvatar(
-                    backgroundImage: AssetImage(_profilePictures[index]),
+                    backgroundImage: AssetImage(
+                      userProfile.userProfileImg(key),
+                    ),
                     radius: 50,
-                    child: _selectedProfile == _profilePictures[index]
-                        ? Icon(Icons.check_circle, color: Colors.green, size: 30)
+                    child: _selectedProfileKey == key
+                        ? Icon(Icons.check_circle, color: const Color.fromARGB(255, 255, 131, 122), size: 30)
                         : null,
                   ),
                 );
@@ -84,9 +87,15 @@ class _ProfilepickState extends State<Profilepick> {
             ),
           ),
           ElevatedButton(
-            onPressed: () {
-              // ส่งรูปโปรไฟล์ที่เลือกกลับไปหน้าโปรไฟล์
-              Navigator.pop(context, _selectedProfile);
+            onPressed: () async {
+              // อัปเดตรูปโปรไฟล์ใน Firestore โดยใช้คีย์ของรูปภาพที่เลือก
+              await PixARTUser.updateProfilePic(
+                context: context,
+                profilePic: userProfile.userProfileImg(_selectedProfileKey),
+              );
+                  // รีเฟรชข้อมูลผู้ใช้
+              Provider.of<UserDataPV>(context, listen: false).refreshUserData();
+              Navigator.pop(context, _selectedProfileKey);
             },
             child: const Text('Confirm'),
           ),
