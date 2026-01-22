@@ -6,12 +6,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:provider/provider.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
-import 'package:testbar4/services/firebase_service/Fire_Activity.dart';
-import 'package:testbar4/manage/manage_icon/icon_path.dart';
-import 'package:testbar4/model/provider_userData.dart';
-import 'package:testbar4/screen/layer2/selectShoes/selectShoes.dart';
-
-
+import 'package:testbar4/routes/export.dart';
 
 class P3Run extends StatefulWidget {
   const P3Run({super.key});
@@ -41,11 +36,9 @@ class _RunPageState extends State<P3Run> {
   int _speedCounter = 0;
   final StopWatchTimer _stopWatchTimer = StopWatchTimer();
   late int _time;
-  bool _isShoeSelected =false;
+  bool _isShoeSelected = false;
   String? _selectedShoe;
   BitmapDescriptor? _markerIcon;
-  
-
 
   @override
   void dispose() async {
@@ -59,15 +52,15 @@ class _RunPageState extends State<P3Run> {
     _loadCustomMarkers();
     _getUserLocation();
   }
+
   Future<void> _loadCustomMarkers() async {
-     final BitmapDescriptor startIcon = await BitmapDescriptor.asset(
+    final BitmapDescriptor startIcon = await BitmapDescriptor.asset(
       const ImageConfiguration(size: Size(35, 35)),
       iconPath.appBarIcon('pin_red_pixel'),
     );
 
     setState(() {
       _markerIcon = startIcon;
-  
     });
   }
 
@@ -110,84 +103,81 @@ class _RunPageState extends State<P3Run> {
           markerId: MarkerId('currentLocation'),
           position: _center,
           infoWindow: InfoWindow(title: 'Current Location'),
-          icon: _markerIcon! ,
+          icon: _markerIcon!,
         ),
       );
     });
   }
-
 
   void _onMapCreated(GoogleMapController controller) {
     _mapController = controller;
   }
 
   void _startTracking() {
-   
     setState(() {
-    _isRunning = true;
-  });
-  _stopWatchTimer.onStartTimer();
-  _location.changeSettings(interval: 500);
-  _location.onLocationChanged.listen((event) {
-    if (!_isRunning) return;
+      _isRunning = true;
+    });
+    _stopWatchTimer.onStartTimer();
+    _location.changeSettings(interval: 500);
+    _location.onLocationChanged.listen((event) {
+      if (!_isRunning) return;
 
-    double? latitude = event.latitude;
-    double? longitude = event.longitude;
+      double? latitude = event.latitude;
+      double? longitude = event.longitude;
 
-    if (latitude != null && longitude != null) {
-      LatLng loc = LatLng(latitude, longitude);
+      if (latitude != null && longitude != null) {
+        LatLng loc = LatLng(latitude, longitude);
 
-      _mapController.animateCamera(CameraUpdate.newCameraPosition(
-          CameraPosition(target: loc, zoom: 15)));
+        _mapController.animateCamera(CameraUpdate.newCameraPosition(
+            CameraPosition(target: loc, zoom: 15)));
 
-      setState(() {
-        _markers.clear();
-        _markers.add(
-          Marker(
-            markerId: const MarkerId('currentLocation'),
-            position: loc,
-            infoWindow: const InfoWindow(title: 'Current Location'),
-            icon: _markerIcon!,
-          ),
-        );
-
-        if (route.isNotEmpty) {
-          double appendDist = Geolocator.distanceBetween(
-            route.last.latitude,
-            route.last.longitude,
-            loc.latitude,
-            loc.longitude,
+        setState(() {
+          _markers.clear();
+          _markers.add(
+            Marker(
+              markerId: const MarkerId('currentLocation'),
+              position: loc,
+              infoWindow: const InfoWindow(title: 'Current Location'),
+              icon: _markerIcon!,
+            ),
           );
-          _dist += appendDist;
 
-          int timeDuration = (_time - _lastTime);
-          if (timeDuration != 0) {
-            _speed = (appendDist / (timeDuration / 1000)) * 3.6;
-            if (_speed != 0) {
-              _avgSpeed += _speed;
-              _speedCounter++;
+          if (route.isNotEmpty) {
+            double appendDist = Geolocator.distanceBetween(
+              route.last.latitude,
+              route.last.longitude,
+              loc.latitude,
+              loc.longitude,
+            );
+            _dist += appendDist;
+
+            int timeDuration = (_time - _lastTime);
+            if (timeDuration != 0) {
+              _speed = (appendDist / (timeDuration / 1000)) * 3.6;
+              if (_speed != 0) {
+                _avgSpeed += _speed;
+                _speedCounter++;
+              }
             }
           }
-        }
 
-        _lastTime = _time;
-        route.add(loc);
+          _lastTime = _time;
+          route.add(loc);
 
-        polyline.clear();
-        polyline.add(
-          Polyline(
-            polylineId: const PolylineId('currentRoute'),
-            points: route,
-            width: 5,
-            startCap: Cap.roundCap,
-            endCap: Cap.roundCap,
-            color: Colors.deepOrange,
-          ),
-        );
-      });
-    }
-  });
-
+          polyline.clear();
+          polyline.add(
+            Polyline(
+              polylineId: const PolylineId('currentRoute'),
+              points: route,
+              width: 5,
+              startCap: Cap.roundCap,
+              endCap: Cap.roundCap,
+              color: Colors.deepOrange,
+            ),
+          );
+        });
+      }
+    });
   }
 
   void _stopTracking() {
@@ -200,79 +190,81 @@ class _RunPageState extends State<P3Run> {
 
   //save route and store in firebase
   void _saveRunData() async {
-  // แปลงรายการเส้นทางเป็นรายการตำแหน่งทางภูมิศาสตร์
-  List<Map<String, dynamic>> routeData = route.map((loc) {
-    return {
-      'latitude': loc.latitude,
-      'longitude': loc.longitude,
-    };
-  }).toList();
+    // แปลงรายการเส้นทางเป็นรายการตำแหน่งทางภูมิศาสตร์
+    List<Map<String, dynamic>> routeData = route.map((loc) {
+      return {
+        'latitude': loc.latitude,
+        'longitude': loc.longitude,
+      };
+    }).toList();
 
-  // รับเวลาในมิลลิวินาทีจาก StopWatchTimer
-  final durationInMilliseconds = _stopWatchTimer.rawTime.value;
-  print('[P3][check data]Duration in milliseconds: $durationInMilliseconds'); 
+    // รับเวลาในมิลลิวินาทีจาก StopWatchTimer
+    final durationInMilliseconds = _stopWatchTimer.rawTime.value;
+    print('[P3][check data]Duration in milliseconds: $durationInMilliseconds');
 
-  // บันทึกข้อมูลลงใน Firebase
-  await Activity.addActivity(
-    distance: _dist,
-    finishdate: DateTime.now(),
-    avgPace: _speedCounter == 0 ? 0 : _avgSpeed / _speedCounter,
-    routeData: routeData,
-    time: durationInMilliseconds,
-  );
+    // บันทึกข้อมูลลงใน Firebase
+    await Activity.addActivity(
+      distance: _dist,
+      finishdate: DateTime.now(),
+      avgPace: _speedCounter == 0 ? 0 : _avgSpeed / _speedCounter,
+      routeData: routeData,
+      time: durationInMilliseconds,
+    );
 
-  print("[P3] ตรวจสอบการเรียกฟังก์ชัน _savedata ไปที่ Firebase");
+    print("[P3] ตรวจสอบการเรียกฟังก์ชัน _savedata ไปที่ Firebase");
 
-  // อัปเดตระยะทางสำหรับรองเท้าที่เลือก
-  if (_selectedShoe != null) {
+    // อัปเดตระยะทางสำหรับรองเท้าที่เลือก
+    if (_selectedShoe != null) {
+      try {
+        // รับ document ID สำหรับรองเท้าที่เลือก
+        String documentID = await _getShoeDocumentID(_selectedShoe!);
+        double newDistance = _dist / 1000; // แปลงระยะทางเป็นกิโลเมตร
+
+        // อัปเดตระยะทางใน Firestore
+        await updateDistance(documentID: documentID, newDistance: newDistance);
+
+        print('อัปเดตระยะทางเรียบร้อยแล้ว');
+      } catch (e) {
+        print('ไม่สามารถอัปเดตระยะทางได้: $e');
+      }
+    }
+  }
+
+  Future<String> _getShoeDocumentID(String shoeName) async {
     try {
-      // รับ document ID สำหรับรองเท้าที่เลือก
-      String documentID = await _getShoeDocumentID(_selectedShoe!);
-      double newDistance = _dist / 1000; // แปลงระยะทางเป็นกิโลเมตร
+      // ดึง document ID ตามชื่อรองเท้า
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('Shoes')
+          .where('shoesName', isEqualTo: shoeName)
+          .where('runnerID',
+              isEqualTo: context
+                  .read<UserDataPV>()
+                  .userData?['id']) // ตรวจสอบว่าเป็นของผู้ใช้ปัจจุบัน
+          .limit(1)
+          .get();
 
-      // อัปเดตระยะทางใน Firestore
-      await updateDistance(documentID: documentID, newDistance: newDistance);
+      if (querySnapshot.docs.isNotEmpty) {
+        return querySnapshot.docs.first.id; // คืนค่า document ID แรก
+      } else {
+        throw Exception('ไม่พบรองเท้า');
+      }
+    } catch (e) {
+      throw Exception('ไม่สามารถดึง document ID ของรองเท้าได้: $e');
+    }
+  }
 
-      print('อัปเดตระยะทางเรียบร้อยแล้ว');
+  static Future<void> updateDistance({
+    required String documentID,
+    required double newDistance,
+  }) async {
+    try {
+      await firestore.collection('Shoes').doc(documentID).update({
+        'shoesRange': newDistance,
+      });
     } catch (e) {
       print('ไม่สามารถอัปเดตระยะทางได้: $e');
     }
   }
-}
-Future<String> _getShoeDocumentID(String shoeName) async {
-  try {
-    // ดึง document ID ตามชื่อรองเท้า
-    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-        .collection('Shoes')
-        .where('shoesName', isEqualTo: shoeName)
-        .where('runnerID', isEqualTo: context.read<UserDataPV>().userData?['id']) // ตรวจสอบว่าเป็นของผู้ใช้ปัจจุบัน
-        .limit(1)
-        .get();
-
-    if (querySnapshot.docs.isNotEmpty) {
-      return querySnapshot.docs.first.id; // คืนค่า document ID แรก
-    } else {
-      throw Exception('ไม่พบรองเท้า');
-    }
-  } catch (e) {
-    throw Exception('ไม่สามารถดึง document ID ของรองเท้าได้: $e');
-  }
-}
-
-static Future<void> updateDistance({
-  required String documentID,
-  required double newDistance,
-}) async {
-  try {
-    await firestore.collection('Shoes').doc(documentID).update({
-      'shoesRange': newDistance,
-    });
-  } catch (e) {
-    print('ไม่สามารถอัปเดตระยะทางได้: $e');
-  }
-}
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -302,13 +294,11 @@ static Future<void> updateDistance({
                 margin: const EdgeInsets.fromLTRB(10, 0, 10, 4),
                 padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
                 decoration: BoxDecoration(
-                  color: Color(0xFFf9f4ef),
-                  border: Border.all(width: 1.8, color: Color(0xFF020826))
-                ),
+                    color: Color(0xFFf9f4ef),
+                    border: Border.all(width: 1.8, color: Color(0xFF020826))),
                 child: Column(
                   children: [
                     Row(
-                      
                       children: [
                         if (_isRunning) ...[
                           // ปุ่ม "Stop"
@@ -329,21 +319,23 @@ static Future<void> updateDistance({
                             ),
                           ),
                           const Spacer(),
-                          //container for time 
+                          //container for time
                           Container(
                             child: Row(
                               children: [
                                 Column(
                                   children: [
-                                    Text("SPEED (KM/H)",
-                                        style: GoogleFonts.pixelifySans(
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.w400,
-                                          color: Color(0xFF0f0e17),
-                                        ),
+                                    Text(
+                                      "SPEED (KM/H)",
+                                      style: GoogleFonts.pixelifySans(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w400,
+                                        color: Color(0xFF0f0e17),
+                                      ),
                                     ),
-                                    Text(_speed.toStringAsFixed(2),
-                                        style: GoogleFonts.pixelifySans(
+                                    Text(
+                                      _speed.toStringAsFixed(2),
+                                      style: GoogleFonts.pixelifySans(
                                         fontSize: 10,
                                         fontWeight: FontWeight.w500,
                                         color: Color(0xFF0f0e17),
@@ -353,12 +345,13 @@ static Future<void> updateDistance({
                                 ),
                                 Column(
                                   children: [
-                                    Text("TIME",
+                                    Text(
+                                      "TIME",
                                       style: GoogleFonts.pixelifySans(
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.w500,
-                                      color: Color(0xFF0f0e17),
-                                    ),
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w500,
+                                        color: Color(0xFF0f0e17),
+                                      ),
                                     ),
                                     StreamBuilder<int>(
                                       stream: _stopWatchTimer.rawTime,
@@ -366,11 +359,14 @@ static Future<void> updateDistance({
                                       builder: (context, snap) {
                                         if (snap.hasData) {
                                           _time = snap.data!;
-                                          _displayTime = StopWatchTimer.getDisplayTimeHours(_time) +
+                                          _displayTime = StopWatchTimer
+                                                  .getDisplayTimeHours(_time) +
                                               ":" +
-                                              StopWatchTimer.getDisplayTimeMinute(_time) +
+                                              StopWatchTimer
+                                                  .getDisplayTimeMinute(_time) +
                                               ":" +
-                                              StopWatchTimer.getDisplayTimeSecond(_time);
+                                              StopWatchTimer
+                                                  .getDisplayTimeSecond(_time);
                                           return Text(
                                             _displayTime,
                                             style: GoogleFonts.pixelifySans(
@@ -391,13 +387,13 @@ static Future<void> updateDistance({
                                         }
                                       },
                                     )
-
                                   ],
                                 ),
                                 Column(
                                   children: [
-                                    Text("DISTANCE (KM)",
-                                        style: GoogleFonts.pixelifySans(
+                                    Text(
+                                      "DISTANCE (KM)",
+                                      style: GoogleFonts.pixelifySans(
                                         fontSize: 10,
                                         fontWeight: FontWeight.w500,
                                         color: Color(0xFF0f0e17),
@@ -420,23 +416,26 @@ static Future<void> updateDistance({
 
                           // ปุ่ม "End"
                           GestureDetector(
-                            onTap: () {
-                              
-                            },
+                            onTap: () {},
                             child: Column(
                               children: [
                                 Image.asset(
-                                    _isShoeSelected
-                                        ? IconPath().appBarIcon('shoesSelection_outline') // ไอคอนใหม่เมื่อเลือกรองเท้า
-                                        : IconPath().appBarIcon('shoesSelection_select'),
-                                    width: 40,
-                                    height: 40,
+                                  _isShoeSelected
+                                      ? IconPath().appBarIcon(
+                                          'shoesSelection_outline') // ไอคอนใหม่เมื่อเลือกรองเท้า
+                                      : IconPath()
+                                          .appBarIcon('shoesSelection_select'),
+                                  width: 40,
+                                  height: 40,
+                                ),
+                                if (_selectedShoe !=
+                                    null) // แสดงชื่อรองเท้าที่เลือกใต้ไอคอน
+                                  Text(
+                                    _selectedShoe!,
+                                    style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w300),
                                   ),
-                                  if (_selectedShoe != null) // แสดงชื่อรองเท้าที่เลือกใต้ไอคอน
-                                    Text(
-                                      _selectedShoe!,
-                                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w300),
-                                    ),
                               ],
                             ),
                           ),
@@ -458,15 +457,17 @@ static Future<void> updateDistance({
                               children: [
                                 Column(
                                   children: [
-                                    Text("SPEED (KM/H)",
-                                        style: GoogleFonts.pixelifySans(
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.w400,
-                                          color: Color(0xFF0f0e17),
-                                        ),
+                                    Text(
+                                      "SPEED (KM/H)",
+                                      style: GoogleFonts.pixelifySans(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w400,
+                                        color: Color(0xFF0f0e17),
+                                      ),
                                     ),
-                                    Text(_speed.toStringAsFixed(2),
-                                        style: GoogleFonts.pixelifySans(
+                                    Text(
+                                      _speed.toStringAsFixed(2),
+                                      style: GoogleFonts.pixelifySans(
                                         fontSize: 10,
                                         fontWeight: FontWeight.w500,
                                         color: Color(0xFF0f0e17),
@@ -476,12 +477,13 @@ static Future<void> updateDistance({
                                 ),
                                 Column(
                                   children: [
-                                    Text("TIME",
+                                    Text(
+                                      "TIME",
                                       style: GoogleFonts.pixelifySans(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w500,
-                                      color: Color(0xFF0f0e17),
-                                    ),
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w500,
+                                        color: Color(0xFF0f0e17),
+                                      ),
                                     ),
                                     StreamBuilder<int>(
                                       stream: _stopWatchTimer.rawTime,
@@ -489,11 +491,14 @@ static Future<void> updateDistance({
                                       builder: (context, snap) {
                                         if (snap.hasData) {
                                           _time = snap.data!;
-                                          _displayTime = StopWatchTimer.getDisplayTimeHours(_time) +
+                                          _displayTime = StopWatchTimer
+                                                  .getDisplayTimeHours(_time) +
                                               ":" +
-                                              StopWatchTimer.getDisplayTimeMinute(_time) +
+                                              StopWatchTimer
+                                                  .getDisplayTimeMinute(_time) +
                                               ":" +
-                                              StopWatchTimer.getDisplayTimeSecond(_time);
+                                              StopWatchTimer
+                                                  .getDisplayTimeSecond(_time);
                                           return Text(
                                             _displayTime,
                                             style: GoogleFonts.pixelifySans(
@@ -514,13 +519,13 @@ static Future<void> updateDistance({
                                         }
                                       },
                                     )
-
                                   ],
                                 ),
                                 Column(
                                   children: [
-                                    Text("DISTANCE (KM)",
-                                        style: GoogleFonts.pixelifySans(
+                                    Text(
+                                      "DISTANCE (KM)",
+                                      style: GoogleFonts.pixelifySans(
                                         fontSize: 10,
                                         fontWeight: FontWeight.w500,
                                         color: Color(0xFF0f0e17),
@@ -548,15 +553,14 @@ static Future<void> updateDistance({
                                 context: context,
                                 builder: (BuildContext context) {
                                   return SelectShoes(
-                                    onSelect: (selectedShoes){
+                                    onSelect: (selectedShoes) {
                                       setState(() {
                                         _selectedShoe = selectedShoes;
                                         _isShoeSelected = true;
                                       });
-                                     Navigator.pop(context);
+                                      Navigator.pop(context);
                                     },
                                   );
-                                    
                                 },
                               );
                             },
@@ -565,21 +569,25 @@ static Future<void> updateDistance({
                                 children: [
                                   Image.asset(
                                     _isShoeSelected
-                                        ? IconPath().appBarIcon('shoesSelection_outline') // ไอคอนใหม่เมื่อเลือกรองเท้า
-                                        : IconPath().appBarIcon('shoesSelection_select'),
+                                        ? IconPath().appBarIcon(
+                                            'shoesSelection_outline') // ไอคอนใหม่เมื่อเลือกรองเท้า
+                                        : IconPath().appBarIcon(
+                                            'shoesSelection_select'),
                                     width: 40,
                                     height: 40,
                                   ),
-                                  if (_selectedShoe != null) // แสดงชื่อรองเท้าที่เลือกใต้ไอคอน
+                                  if (_selectedShoe !=
+                                      null) // แสดงชื่อรองเท้าที่เลือกใต้ไอคอน
                                     Text(
                                       _selectedShoe!,
-                                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w300),
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w300),
                                     ),
                                 ],
                               ),
                             ),
                           ),
-
                         ],
                       ],
                     )

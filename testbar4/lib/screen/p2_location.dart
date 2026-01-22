@@ -2,19 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:testbar4/services/firebase_service/Fire_Location.dart';
-import 'package:testbar4/model/provider_userData.dart';
-import 'package:testbar4/screen/layer2/location/component/card.dart';
+import 'package:testbar4/routes/export.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+
 class P2Location extends StatelessWidget {
   P2Location({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<UserDataPV>(builder: (context, userDataProvider, child) {
-      final userData = userDataProvider.userData;
-      final userId = userData?['id'] ?? 'none user id';
-      return  Scaffold(
+    return Consumer<UserDataPV>(
+      builder: (context, userDataProvider, child) {
+        final userData = userDataProvider.userData;
+        final userId = userData?['id'] ?? 'none user id';
+        return Scaffold(
           backgroundColor: const Color(0xFFfffffe),
           body: Stack(
             children: [
@@ -26,25 +26,28 @@ class P2Location extends StatelessWidget {
                     child: FutureBuilder<List<QueryDocumentSnapshot>>(
                       future: Locations.fetchPublicLocations(),
                       builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
                           return Center(
                             child: LoadingAnimationWidget.discreteCircle(
-                              color: Colors.green, 
+                              color: Colors.green,
                               size: 50,
                             ),
                           );
                         }
-                    
+
                         if (snapshot.hasError) {
-                          return Center(child: Text('Error: ${snapshot.error}'));
+                          return Center(
+                              child: Text('Error: ${snapshot.error}'));
                         }
-                    
+
                         if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                          return const Center(child: Text('No public locations found'));
+                          return const Center(
+                              child: Text('No public locations found'));
                         }
-                    
+
                         final publicDocuments = snapshot.data!;
-                    
+
                         return Container(
                           margin: const EdgeInsets.symmetric(vertical: 10.0),
                           padding: const EdgeInsets.all(8.0),
@@ -69,7 +72,7 @@ class P2Location extends StatelessWidget {
                                   color: Colors.black,
                                 ),
                               ),
-                              
+
                               // Build List of Public Location Cards
                               ListView.builder(
                                 shrinkWrap: true,
@@ -77,8 +80,9 @@ class P2Location extends StatelessWidget {
                                 itemCount: publicDocuments.length,
                                 itemBuilder: (context, index) {
                                   final doc = publicDocuments[index];
-                                  final data = doc.data() as Map<String, dynamic>;
-                    
+                                  final data =
+                                      doc.data() as Map<String, dynamic>;
+
                                   return Column(
                                     children: [
                                       CardLocation(
@@ -102,25 +106,28 @@ class P2Location extends StatelessWidget {
                     child: FutureBuilder<List<QueryDocumentSnapshot>>(
                       future: Locations.fetchPrivateLocations(userId),
                       builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
                           return Center(
                             child: LoadingAnimationWidget.discreteCircle(
-                              color: Colors.green, 
+                              color: Colors.green,
                               size: 50,
                             ),
                           );
                         }
-                    
+
                         if (snapshot.hasError) {
-                          return Center(child: Text('Error: ${snapshot.error}'));
+                          return Center(
+                              child: Text('Error: ${snapshot.error}'));
                         }
-                    
+
                         if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                          return const Center(child: Text('No private locations found'));
+                          return const Center(
+                              child: Text('No private locations found'));
                         }
-                    
+
                         final privateDocuments = snapshot.data!;
-                    
+
                         return Container(
                           margin: const EdgeInsets.symmetric(vertical: 10.0),
                           padding: const EdgeInsets.all(8.0),
@@ -152,8 +159,9 @@ class P2Location extends StatelessWidget {
                                 itemCount: privateDocuments.length,
                                 itemBuilder: (context, index) {
                                   final doc = privateDocuments[index];
-                                  final data = doc.data() as Map<String, dynamic>;
-                    
+                                  final data =
+                                      doc.data() as Map<String, dynamic>;
+
                                   return Column(
                                     children: [
                                       CardLocation(

@@ -2,16 +2,12 @@ flutter_native_splash:
   android: true
   ios: true
 
-  color: "#eaddcf"
-  image: "assets/appIcon/icon01.jpeg"
-  icon_background_color : "#eaddcf"
+  color: "#00ff7b"
+  image: "assets/appIcon/testicon.png"
+  icon_background_color : "#00371b"
   
 
   android_12:
-    color: "#eaddcf"
-    image: "assets/appIcon/icon01.jpeg"
-    icon_background_color : "#eaddcf"
-
-    #if you want to change or build you can paste this command in terminal
-    #dart run flutter_native_splash:create --path=native_splash.yaml
-    #start debug your app again
+    color: "#00ff7b"
+    image: "assets/appIcon/IconforNative.png"
+    icon_background_color : "#00371b"

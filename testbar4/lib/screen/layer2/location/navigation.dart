@@ -6,12 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
-import 'package:testbar4/services/firebase_service/Fire_Activity.dart';
-import 'package:testbar4/manage/manage_icon/icon_path.dart';
-import 'package:flutter/services.dart';
-import 'package:testbar4/model/provider_userData.dart';
-
-import '../selectShoes/selectShoes.dart';
+import 'package:testbar4/routes/export.dart';
 
 class Navigation extends StatefulWidget {
   Navigation({super.key, required this.route});
@@ -40,8 +35,8 @@ class _NavigationState extends State<Navigation> {
   int _speedCounter = 0;
   final StopWatchTimer _stopWatchTimer = StopWatchTimer();
   final List<LatLng> _trackingRoute = [];
-   bool _isShoeSelected =false;
-   String? _selectedShoe;
+  bool _isShoeSelected = false;
+  String? _selectedShoe;
 
   @override
   void dispose() {
@@ -56,7 +51,7 @@ class _NavigationState extends State<Navigation> {
     _getCurrentPosition();
     //_checkProximityToStart();
     _loadCustomMarkers();
-    
+
     // Move camera to cover route on initialization
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _moveCameraToCoverRoute();
@@ -65,7 +60,7 @@ class _NavigationState extends State<Navigation> {
 
   //load marker
   Future<void> _loadCustomMarkers() async {
-     final BitmapDescriptor startIcon = await BitmapDescriptor.asset(
+    final BitmapDescriptor startIcon = await BitmapDescriptor.asset(
       const ImageConfiguration(size: Size(30, 30)),
       iconPath.appBarIcon('pin_red'),
     );
@@ -79,8 +74,6 @@ class _NavigationState extends State<Navigation> {
       const ImageConfiguration(size: Size(30, 30)),
       iconPath.appBarIcon('pin_black'),
     );
-    
-    
 
     setState(() {
       startMarkerIcon = startIcon;
@@ -89,7 +82,7 @@ class _NavigationState extends State<Navigation> {
     });
   }
 
-    // Check if the user is close to the start point
+  // Check if the user is close to the start point
   void _checkProximityToStart() {
     LocationSettings locationSettings = const LocationSettings(
       accuracy: LocationAccuracy.high,
@@ -104,7 +97,8 @@ class _NavigationState extends State<Navigation> {
             .listen((Position position) {
       setState(() {
         _currentPosition = position;
-        final startLatLng = LatLng(widget.route.first['latitude'], widget.route.first['longitude']);
+        final startLatLng = LatLng(
+            widget.route.first['latitude'], widget.route.first['longitude']);
         final distanceToStart = Geolocator.distanceBetween(
           position.latitude,
           position.longitude,
@@ -118,126 +112,126 @@ class _NavigationState extends State<Navigation> {
         print("[Navigation] Canrun state: $_canStartRun");
       });
     });
-    
-
   }
 
   void _moveCameraToCoverRoute() async {
-  final GoogleMapController controller = await _controller.future;
-  
-  // Create LatLngBounds to cover all the points of the route
-  LatLngBounds bounds;
-  if (widget.route.isNotEmpty) {
-    List<LatLng> routePoints = widget.route.map((location) {
+    final GoogleMapController controller = await _controller.future;
+
+    // Create LatLngBounds to cover all the points of the route
+    LatLngBounds bounds;
+    if (widget.route.isNotEmpty) {
+      List<LatLng> routePoints = widget.route.map((location) {
+        return LatLng(location['latitude'], location['longitude']);
+      }).toList();
+
+      // Include current position if available
+      if (_currentPosition != null) {
+        routePoints.add(
+            LatLng(_currentPosition!.latitude, _currentPosition!.longitude));
+      }
+
+      bounds = _createBoundsFromLatLngList(routePoints);
+
+      // Animate camera to cover the route with padding
+      controller.animateCamera(CameraUpdate.newLatLngBounds(bounds, 50));
+    }
+  }
+
+  LatLngBounds _createBoundsFromLatLngList(List<LatLng> points) {
+    double southWestLat = points.first.latitude;
+    double southWestLng = points.first.longitude;
+    double northEastLat = points.first.latitude;
+    double northEastLng = points.first.longitude;
+
+    for (LatLng point in points) {
+      if (point.latitude < southWestLat) southWestLat = point.latitude;
+      if (point.longitude < southWestLng) southWestLng = point.longitude;
+      if (point.latitude > northEastLat) northEastLat = point.latitude;
+      if (point.longitude > northEastLng) northEastLng = point.longitude;
+    }
+
+    return LatLngBounds(
+      southwest: LatLng(southWestLat, southWestLng),
+      northeast: LatLng(northEastLat, northEastLng),
+    );
+  }
+
+  // ฟังก์ชันเพื่อดึงตำแหน่งปัจจุบันและอัปเดตกล้องกับ marker
+  Future<void> _getCurrentPosition() async {
+    try {
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+      setState(() {
+        _currentPosition = position;
+        LatLng currentLatLng = LatLng(position.latitude, position.longitude);
+        _updateCurrentLocationMarker(currentLatLng);
+
+        _moveCameraToRouteAndUser(currentLatLng);
+      });
+    } catch (e) {
+      print('Error getting current position: $e');
+    }
+  }
+
+// อัปเดตกล้องให้ครอบคลุมทั้งเส้นทางและตำแหน่งผู้ใช้
+  void _moveCameraToRouteAndUser(LatLng userLatLng) {
+    if (widget.route.isEmpty) return;
+
+    List<LatLng> latLngBoundsPoints = widget.route.map((location) {
       return LatLng(location['latitude'], location['longitude']);
     }).toList();
 
-    // Include current position if available
-    if (_currentPosition != null) {
-      routePoints.add(LatLng(_currentPosition!.latitude, _currentPosition!.longitude));
-    }
+    latLngBoundsPoints.add(userLatLng); // รวมตำแหน่งผู้ใช้
 
-    bounds = _createBoundsFromLatLngList(routePoints);
-    
-    // Animate camera to cover the route with padding
-    controller.animateCamera(CameraUpdate.newLatLngBounds(bounds, 50));
-  }
-}
+    LatLngBounds bounds = _getLatLngBounds(latLngBoundsPoints);
 
-LatLngBounds _createBoundsFromLatLngList(List<LatLng> points) {
-  double southWestLat = points.first.latitude;
-  double southWestLng = points.first.longitude;
-  double northEastLat = points.first.latitude;
-  double northEastLng = points.first.longitude;
-
-  for (LatLng point in points) {
-    if (point.latitude < southWestLat) southWestLat = point.latitude;
-    if (point.longitude < southWestLng) southWestLng = point.longitude;
-    if (point.latitude > northEastLat) northEastLat = point.latitude;
-    if (point.longitude > northEastLng) northEastLng = point.longitude;
-  }
-
-  return LatLngBounds(
-    southwest: LatLng(southWestLat, southWestLng),
-    northeast: LatLng(northEastLat, northEastLng),
-  );
-}
-
-  // ฟังก์ชันเพื่อดึงตำแหน่งปัจจุบันและอัปเดตกล้องกับ marker
-Future<void> _getCurrentPosition() async {
-  try {
-    Position position = await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.high,
-    );
-    setState(() {
-      _currentPosition = position;
-      LatLng currentLatLng = LatLng(position.latitude, position.longitude);
-      _updateCurrentLocationMarker(currentLatLng);
-      
-      _moveCameraToRouteAndUser(currentLatLng);
+    _controller.future.then((GoogleMapController controller) {
+      controller.animateCamera(
+        CameraUpdate.newLatLngBounds(
+            bounds, 100), // ครอบคลุมเส้นทางและตำแหน่งผู้ใช้
+      );
     });
-  } catch (e) {
-    print('Error getting current position: $e');
   }
-}
-
-// อัปเดตกล้องให้ครอบคลุมทั้งเส้นทางและตำแหน่งผู้ใช้
-void _moveCameraToRouteAndUser(LatLng userLatLng) {
-  if (widget.route.isEmpty) return;
-
-  List<LatLng> latLngBoundsPoints = widget.route.map((location) {
-    return LatLng(location['latitude'], location['longitude']);
-  }).toList();
-
-  latLngBoundsPoints.add(userLatLng); // รวมตำแหน่งผู้ใช้
-
-  LatLngBounds bounds = _getLatLngBounds(latLngBoundsPoints);
-
-  _controller.future.then((GoogleMapController controller) {
-    controller.animateCamera(
-      CameraUpdate.newLatLngBounds(bounds, 100), // ครอบคลุมเส้นทางและตำแหน่งผู้ใช้
-    );
-  });
-}
 
 // ฟังก์ชันเพื่อคำนวณ LatLngBounds
-LatLngBounds _getLatLngBounds(List<LatLng> points) {
-  double? minLat, maxLat, minLng, maxLng;
+  LatLngBounds _getLatLngBounds(List<LatLng> points) {
+    double? minLat, maxLat, minLng, maxLng;
 
-  for (LatLng point in points) {
-    if (minLat == null || point.latitude < minLat) minLat = point.latitude;
-    if (maxLat == null || point.latitude > maxLat) maxLat = point.latitude;
-    if (minLng == null || point.longitude < minLng) minLng = point.longitude;
-    if (maxLng == null || point.longitude > maxLng) maxLng = point.longitude;
+    for (LatLng point in points) {
+      if (minLat == null || point.latitude < minLat) minLat = point.latitude;
+      if (maxLat == null || point.latitude > maxLat) maxLat = point.latitude;
+      if (minLng == null || point.longitude < minLng) minLng = point.longitude;
+      if (maxLng == null || point.longitude > maxLng) maxLng = point.longitude;
+    }
+
+    return LatLngBounds(
+      southwest: LatLng(minLat!, minLng!),
+      northeast: LatLng(maxLat!, maxLng!),
+    );
   }
 
-  return LatLngBounds(
-    southwest: LatLng(minLat!, minLng!),
-    northeast: LatLng(maxLat!, maxLng!),
-  );
-}
-
   void _startTracking() {
-    //click run func call _checkProximityToStart() to check user can run and change state 
+    //click run func call _checkProximityToStart() to check user can run and change state
     //_checkProximityToStart();
     if (_canStartRun) {
       LocationSettings locationSettings = const LocationSettings(
         accuracy: LocationAccuracy.high,
         distanceFilter: 10,
       );
-          _positionStreamSubscription =
-            Geolocator.getPositionStream(locationSettings: locationSettings)
-                .listen((Position position) {
-          setState(() {
-            _currentPosition = position;
-            final currentLatLng = LatLng(position.latitude, position.longitude);
-            _trackingRoute.add(currentLatLng);
-            _updatePolyline();
-            _updateCurrentLocationMarker(currentLatLng);
-            _isNavigation = true;
+      _positionStreamSubscription =
+          Geolocator.getPositionStream(locationSettings: locationSettings)
+              .listen((Position position) {
+        setState(() {
+          _currentPosition = position;
+          final currentLatLng = LatLng(position.latitude, position.longitude);
+          _trackingRoute.add(currentLatLng);
+          _updatePolyline();
+          _updateCurrentLocationMarker(currentLatLng);
+          _isNavigation = true;
 
-            // Move camera to cover the new position and the route
-            _moveCameraToCoverRoute();
+          // Move camera to cover the new position and the route
+          _moveCameraToCoverRoute();
 
           // Calculate distance and speed
           if (_lastPosition != null) {
@@ -281,11 +275,11 @@ LatLngBounds _getLatLngBounds(List<LatLng> points) {
       _isNavigation = false;
     });
   }
-  
 
   // Check if user has reached the endpoint
   void _checkIfReachedEndpoint(LatLng currentLatLng) {
-    final endLatLng = LatLng(widget.route.last['latitude'], widget.route.last['longitude']);
+    final endLatLng =
+        LatLng(widget.route.last['latitude'], widget.route.last['longitude']);
     final distanceToEnd = Geolocator.distanceBetween(
       currentLatLng.latitude,
       currentLatLng.longitude,
@@ -307,7 +301,6 @@ LatLngBounds _getLatLngBounds(List<LatLng> points) {
       });
     }
   }
-
 
   void _updatePolyline() {
     setState(() {
@@ -355,23 +348,21 @@ LatLngBounds _getLatLngBounds(List<LatLng> points) {
     );
 
     // อัปเดตระยะทางสำหรับรองเท้าที่เลือก
-  if (_selectedShoe != null) {
-    try {
-      // รับ document ID สำหรับรองเท้าที่เลือก
-      String documentID = await _getShoeDocumentID(_selectedShoe!);
-      double newDistance = _distance / 1000; // แปลงระยะทางเป็นกิโลเมตร
+    if (_selectedShoe != null) {
+      try {
+        // รับ document ID สำหรับรองเท้าที่เลือก
+        String documentID = await _getShoeDocumentID(_selectedShoe!);
+        double newDistance = _distance / 1000; // แปลงระยะทางเป็นกิโลเมตร
 
-      // อัปเดตระยะทางใน Firestore
-      await updateDistance(documentID: documentID, newDistance: newDistance);
-
-      
-    } catch (e) {
-      print("[P2][Navigation][_savedata] shoes: add distance successfuly!  ");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Run data saved successfully!")),
-      );
+        // อัปเดตระยะทางใน Firestore
+        await updateDistance(documentID: documentID, newDistance: newDistance);
+      } catch (e) {
+        print("[P2][Navigation][_savedata] shoes: add distance successfuly!  ");
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Run data saved successfully!")),
+        );
+      }
     }
-  }
 
     print("[P2] Check call func _saveRunData to Firestore ");
     ScaffoldMessenger.of(context).showSnackBar(
@@ -385,7 +376,10 @@ LatLngBounds _getLatLngBounds(List<LatLng> points) {
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection('Shoes')
           .where('shoesName', isEqualTo: shoeName)
-          .where('runnerID', isEqualTo: context.read<UserDataPV>().userData?['id']) // ตรวจสอบว่าเป็นของผู้ใช้ปัจจุบัน
+          .where('runnerID',
+              isEqualTo: context
+                  .read<UserDataPV>()
+                  .userData?['id']) // ตรวจสอบว่าเป็นของผู้ใช้ปัจจุบัน
           .limit(1)
           .get();
 
@@ -398,6 +392,7 @@ LatLngBounds _getLatLngBounds(List<LatLng> points) {
       throw Exception('ไม่สามารถดึง document ID ของรองเท้าได้: $e');
     }
   }
+
   static Future<void> updateDistance({
     required String documentID,
     required double newDistance,
@@ -426,21 +421,21 @@ LatLngBounds _getLatLngBounds(List<LatLng> points) {
     return Scaffold(
       appBar: AppBar(
         flexibleSpace: Container(
-            decoration: const BoxDecoration(
-              
+          decoration: const BoxDecoration(
               color: Color(0xFFf9f4ef),
-              border: Border(bottom: BorderSide(width: 3,color: Color(0xFF0f0e17)))
-            ),
+              border: Border(
+                  bottom: BorderSide(width: 3, color: Color(0xFF0f0e17)))),
+        ),
+        title: Text(
+          "Navigation",
+          style: GoogleFonts.pixelifySans(
+            fontSize: 30,
+            fontWeight: FontWeight.w500,
+            color: Color(0xFF0f0e17),
           ),
-          title: Text(
-            "Navigation",
-            style: GoogleFonts.pixelifySans(
-              fontSize: 30,
-              fontWeight: FontWeight.w500,
-              color: Color(0xFF0f0e17),
-            ),
-          ),
-          backgroundColor: Colors.transparent,      ),
+        ),
+        backgroundColor: Colors.transparent,
+      ),
       body: Stack(
         children: [
           GoogleMap(
@@ -470,159 +465,167 @@ LatLngBounds _getLatLngBounds(List<LatLng> points) {
                   infoWindow: const InfoWindow(title: 'End'),
                   icon: endMarkerIcon ?? BitmapDescriptor.defaultMarker,
                 ),
-                
             }),
             // Add circles for start and end points
             circles: {
               Circle(
-              circleId: const CircleId('startCircle'),
-              center: startLatLng,
-              radius: 50, // radius in meters
-              strokeColor: Colors.black,
-              strokeWidth: 3,
-              fillColor: Colors.blue.withOpacity(0.2),
-            ),
-            if (latLngRoute.isNotEmpty)
-              Circle(
-                circleId: const CircleId('endCircle'),
-                center: latLngRoute.last,
+                circleId: const CircleId('startCircle'),
+                center: startLatLng,
                 radius: 50, // radius in meters
                 strokeColor: Colors.black,
                 strokeWidth: 3,
-                fillColor: Colors.yellow.withOpacity(0.2),
+                fillColor: Colors.blue.withOpacity(0.2),
               ),
+              if (latLngRoute.isNotEmpty)
+                Circle(
+                  circleId: const CircleId('endCircle'),
+                  center: latLngRoute.last,
+                  radius: 50, // radius in meters
+                  strokeColor: Colors.black,
+                  strokeWidth: 3,
+                  fillColor: Colors.yellow.withOpacity(0.2),
+                ),
             },
             onMapCreated: (GoogleMapController controller) {
               _controller.complete(controller);
             },
           ),
-          
           Positioned(
-          bottom: 30,
-          left: 8,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // ปุ่ม "Square"
-              GestureDetector(
-                onTap: () {
-                showModalBottomSheet(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return SelectShoes(
-                                    onSelect: (selectedShoes){
-                                      setState(() {
-                                        _selectedShoe = selectedShoes;
-                                        _isShoeSelected = true;
-                                      });
-                                     Navigator.pop(context);
-                                    },
-                                  );
-                                    
-                                },
-                              );
-                            },
-                            child: Center(
-                              child: Column(
-                                children: [
-                                  Image.asset(
-                                    _isShoeSelected
-                                        ? IconPath().appBarIcon('shoesSelection_outline') // ไอคอนใหม่เมื่อเลือกรองเท้า
-                                        : IconPath().appBarIcon('shoesSelection_select'),
-                                    width: 40,
-                                    height: 40,
-                                  ),
-                                  if (_selectedShoe != null) // แสดงชื่อรองเท้าที่เลือกใต้ไอคอน
-                                    Text(
-                                      _selectedShoe!,
-                                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w300),
-                                    ),
-                                ],
-                              ),
-                            ),
-                          ),
-              if (!_isRunning)
-                IconButton(
-                  onPressed: () {
-                    // เรียกใช้การเช็คตำแหน่งก่อนที่จะเปลี่ยนสถานะ
-                    _checkProximityToStart();
-
-                    // รอให้ `_checkProximityToStart` อัปเดตสถานะ `_canStartRun`
-                    Future.delayed(const Duration(milliseconds: 500), () {
-                      if (_canStartRun) {
-                        setState(() {
-                          _isRunning = true;
-                        });
-                        _startTracking();
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text("You must be at the start point to begin!"),
-                            backgroundColor: Colors.redAccent[400],
-                          ),
+            bottom: 30,
+            left: 8,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // ปุ่ม "Square"
+                GestureDetector(
+                  onTap: () {
+                    showModalBottomSheet(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return SelectShoes(
+                          onSelect: (selectedShoes) {
+                            setState(() {
+                              _selectedShoe = selectedShoes;
+                              _isShoeSelected = true;
+                            });
+                            Navigator.pop(context);
+                          },
                         );
-                      }
-                    });
+                      },
+                    );
                   },
-                  icon: Image.asset(
-                    iconPath.appBarIcon('play-button_outline'), 
-                    width: 45, 
-                    height: 45,
-                  ),
-                )
-
-              else
-                Column(
-                  children: [
-                    IconButton(
-                      onPressed: () {
-                        _stopTracking();
-                        setState(() {
-                          _isRunning = false;
-                        });
-                      },
-                      icon: Image.asset(
-                        iconPath.appBarIcon('pause_outline'), 
-                        width: 45, 
-                        height: 45,
-                      ),
+                  child: Center(
+                    child: Column(
+                      children: [
+                        Image.asset(
+                          _isShoeSelected
+                              ? IconPath().appBarIcon(
+                                  'shoesSelection_outline') // ไอคอนใหม่เมื่อเลือกรองเท้า
+                              : IconPath().appBarIcon('shoesSelection_select'),
+                          width: 40,
+                          height: 40,
+                        ),
+                        if (_selectedShoe !=
+                            null) // แสดงชื่อรองเท้าที่เลือกใต้ไอคอน
+                          Text(
+                            _selectedShoe!,
+                            style: TextStyle(
+                                fontSize: 12, fontWeight: FontWeight.w300),
+                          ),
+                      ],
                     ),
-                    const SizedBox(width: 10),
-                    IconButton(
-                      onPressed: () {
-                        _stopTracking();
-                        _saveRunData();
-                        Navigator.pop(context);
-                      },
-                      icon: Image.asset(
-                        iconPath.appBarIcon('the-end_outline'), 
-                        width: 45, 
-                        height: 45,
+                  ),
+                ),
+                if (!_isRunning)
+                  IconButton(
+                    onPressed: () {
+                      // เรียกใช้การเช็คตำแหน่งก่อนที่จะเปลี่ยนสถานะ
+                      _checkProximityToStart();
+
+                      // รอให้ `_checkProximityToStart` อัปเดตสถานะ `_canStartRun`
+                      Future.delayed(const Duration(milliseconds: 500), () {
+                        if (_canStartRun) {
+                          setState(() {
+                            _isRunning = true;
+                          });
+                          _startTracking();
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                  "You must be at the start point to begin!"),
+                              backgroundColor: Colors.redAccent[400],
+                            ),
+                          );
+                        }
+                      });
+                    },
+                    icon: Image.asset(
+                      iconPath.appBarIcon('play-button_outline'),
+                      width: 45,
+                      height: 45,
+                    ),
+                  )
+                else
+                  Column(
+                    children: [
+                      IconButton(
+                        onPressed: () {
+                          _stopTracking();
+                          setState(() {
+                            _isRunning = false;
+                          });
+                        },
+                        icon: Image.asset(
+                          iconPath.appBarIcon('pause_outline'),
+                          width: 45,
+                          height: 45,
+                        ),
                       ),
+                      const SizedBox(width: 10),
+                      IconButton(
+                        onPressed: () {
+                          _stopTracking();
+                          _saveRunData();
+                          Navigator.pop(context);
+                        },
+                        icon: Image.asset(
+                          iconPath.appBarIcon('the-end_outline'),
+                          width: 45,
+                          height: 45,
+                        ),
+                      ),
+                    ],
+                  ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    StreamBuilder<int>(
+                      stream: _stopWatchTimer.rawTime,
+                      initialData: 0,
+                      builder: (context, snapshot) {
+                        final value = snapshot.data!;
+                        final displayTime =
+                            StopWatchTimer.getDisplayTime(value);
+                        return Text(
+                          'Time: $displayTime',
+                          style: const TextStyle(fontSize: 15),
+                        );
+                      },
+                    ),
+                    Text(
+                      'Distance: ${_distance.toStringAsFixed(2)} m',
+                      style: const TextStyle(fontSize: 15),
+                    ),
+                    Text(
+                      'Speed: ${_speed.toStringAsFixed(2)} m/s',
+                      style: const TextStyle(fontSize: 15),
                     ),
                   ],
                 ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  StreamBuilder<int>(
-                    stream: _stopWatchTimer.rawTime,
-                    initialData: 0,
-                    builder: (context, snapshot) {
-                      final value = snapshot.data!;
-                      final displayTime = StopWatchTimer.getDisplayTime(value);
-                      return Text('Time: $displayTime', style: const TextStyle(fontSize: 15),);
-                    },
-                  ),
-                  Text('Distance: ${_distance.toStringAsFixed(2)} m', style: const TextStyle(fontSize: 15),),
-                  Text('Speed: ${_speed.toStringAsFixed(2)} m/s', style: const TextStyle(fontSize: 15),),
-                ],
-              ),
-            ],
-          ),
-        )
-
-
+              ],
+            ),
+          )
         ],
       ),
     );
