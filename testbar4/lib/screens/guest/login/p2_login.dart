@@ -1,8 +1,9 @@
-import 'package:flutter/material.dart';
 // import 'package:firebase_auth/firebase_auth.dart';
 // import 'package:google_sign_in/google_sign_in.dart';
 // import 'package:provider/provider.dart';
+import 'package:flutter/material.dart';
 import 'package:testbar4/routes/export.dart';
+import 'package:testbar4/routes/routes.dart';
 // import 'package:testbar4/provider/provider_userData.dart';
 // import 'package:testbar4/screens/guest/login/p5_aftersign_inwithG.dart';
 
@@ -79,7 +80,7 @@ class P2Login extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       GestureDetector(
-                        onTap: () => Navigator.pushNamed(context, '/p14'),
+                        onTap: () => Navigator.pushNamed(context, Routes.p9),
                         child: Text(
                           'Forgot password?',
                           style: TextStyle(color: Colors.grey[600]),
@@ -98,7 +99,7 @@ class P2Login extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       GestureDetector(
-                        onTap: () => Navigator.pushNamed(context, '/p8'),
+                        onTap: () => Navigator.pushNamed(context, Routes.p8),
                         child: Text(
                           'Register',
                           style: TextStyle(color: Colors.grey[600]),

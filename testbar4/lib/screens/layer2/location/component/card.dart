@@ -4,9 +4,10 @@ import 'package:testbar4/routes/export.dart';
 
 class CardLocation extends StatelessWidget {
   final Map<String, dynamic> data;
+  final String documentId;
   final IconPath iconpath = IconPath();
 
-  CardLocation({super.key, required this.data});
+  CardLocation({super.key, required this.data, required this.documentId});
 
   @override
   Widget build(BuildContext context) {

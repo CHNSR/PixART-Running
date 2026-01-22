@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:location/location.dart';
 import 'package:testbar4/routes/export.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
@@ -36,14 +35,14 @@ class P2Location extends StatelessWidget {
               itemCount: documents.length,
               itemBuilder: (context, index) {
                 final doc = documents[index];
-                //final data = doc.data() as Map<String, dynamic>;
+                final data = doc.data() as Map<String, dynamic>;
                 final documentID = doc.id;
 
                 return Column(
                   children: [
                     CardLocation(
-                      documentId:
-                          documentID, // Pass the document ID to CardLocation
+                      documentId: documentID,
+                      data: data,
                     ),
                     SizedBox(
                       height: 10,

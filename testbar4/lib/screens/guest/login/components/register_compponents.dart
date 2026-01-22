@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:testbar4/routes/routes.dart';
 
 class NPSTextField extends StatelessWidget {
   final TextEditingController controller;
@@ -280,7 +281,7 @@ class RegisterButton extends StatelessWidget {
         const SnackBar(content: Text('Registration Successful')),
       );
       // Navigate to login page after successful registration
-      Navigator.pushReplacementNamed(context, '/p7');
+      Navigator.pushReplacementNamed(context, Routes.p7);
     } on FirebaseAuthException catch (e) {
       String message = '';
       if (e.code == 'weak-password') {

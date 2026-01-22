@@ -92,7 +92,7 @@ class _HeatmapCPState extends State<HeatmapCP> {
             7: Colors.purple,
           },
           size: 40,
-          flexible: true,
+          flexible: false,
           weekTextColor: Colors.black,
           onClick: (date) {
             loadTotalDistanceForDate(

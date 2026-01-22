@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:testbar4/routes/export.dart';
+import 'package:testbar4/routes/routes.dart';
 
 class P3Register extends StatelessWidget {
   P3Register({super.key});
@@ -119,7 +120,7 @@ class P3Register extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     GestureDetector(
-                      onTap: () => Navigator.pushNamed(context, '/p7'),
+                      onTap: () => Navigator.pushNamed(context, Routes.p7),
                       child: Text(
                         'Login',
                         style: TextStyle(color: Colors.grey[600]),

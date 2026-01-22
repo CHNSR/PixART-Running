@@ -3,9 +3,12 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:testbar4/routes/export.dart';
 
 class GAuthService {
-  final GoogleSignIn googleSignIn = GoogleSignIn();
+  //final GoogleSignIn googleSignIn = GoogleSignIn();
 
   Future<User?> signInWithGoogle() async {
+    print("Google Sign-In is disabled");
+    return null;
+    /*
     print("use signInWithGoogle");
     try {
       // Call Google Sign-In
@@ -37,8 +40,8 @@ class GAuthService {
           password:
               'temporary_password', // Password management can be handled later
           name: user.displayName ?? 'User', // Display name from Google
-          weight: 0, // Default weight, ask the user later
-          height: 0, // Default height, ask the user later
+          weight: 0.0, // Default weight, ask the user later
+          height: 0.0, // Default height, ask the user later
           birthday: DateTime(2000, 1, 1), // Default birthday, prompt later
           goal: 0, // Default goal
         );
@@ -49,5 +52,6 @@ class GAuthService {
       print("Error signing in with Google: $e");
       return null; // Return null if an error occurs
     }
+    */
   }
 }

@@ -8,16 +8,22 @@
 .buildlog/
 .history
 .svn/
+<<<<<<< HEAD
 migrate_working_dir/
 hs_err_pid*
 replay_pid*
 
 # IntelliJ related
+=======
+
+# IntelliJ
+>>>>>>> restructure
 *.iml
 *.ipr
 *.iws
 .idea/
 
+<<<<<<< HEAD
 # Flutter/Dart/Pub related
 **/doc/api/
 **/ios/Flutter/.last_build_id
@@ -59,3 +65,64 @@ app.*.map.json
 *.key
 
 
+=======
+# VS Code
+.vscode/
+
+# Flutter/Dart/Pub (Inside testbar4)
+testbar4/.dart_tool/
+testbar4/.flutter-plugins
+testbar4/.flutter-plugins-dependencies
+testbar4/.packages
+testbar4/build/
+testbar4/.pub-cache/
+testbar4/.pub/
+testbar4/pubspec.lock
+
+# Android (Inside testbar4)
+testbar4/android/key.properties
+testbar4/android/local.properties
+testbar4/android/generated/
+testbar4/android/app/generated/
+testbar4/android/.gradle
+testbar4/android/captures/
+testbar4/android/gradle/wrapper/gradle-wrapper.jar
+testbar4/android/app/src/main/assets/
+
+# iOS (Inside testbar4)
+testbar4/ios/.generated/
+testbar4/ios/Flutter/Generated.xcconfig
+testbar4/ios/Flutter/flutter_export_environment.sh
+testbar4/ios/Flutter/app.flx
+testbar4/ios/Flutter/app.zip
+testbar4/ios/Flutter/fonts/
+testbar4/ios/Flutter/start_up_info.json
+testbar4/ios/ServiceDefinitions.json
+testbar4/ios/Runner/GeneratedPluginRegistrant.*
+
+# Windows (Inside testbar4)
+testbar4/windows/flutter/generated_plugin_registrant.cc
+testbar4/windows/flutter/generated_plugin_registrant.h
+testbar4/windows/runner/resources/app_icon.ico
+
+# MacOS (Inside testbar4)
+testbar4/macos/Flutter/generated_plugin_registrant.swift
+
+# Web (Inside testbar4)
+testbar4/web/icons/
+testbar4/web/favicon.png
+testbar4/web/manifest.json
+
+# API Keys and Secrets / Environment Variables
+.env
+.env.*
+*.env
+env/
+testbar4/lib/api_keys.dart
+testbar4/lib/secrets.dart
+testbar4/lib/config/api_config.dart
+testbar4/google-services.json
+testbar4/GoogleService-Info.plist
+testbar4/firebase_options.dart
+testbar4/lib/firebase_options.dart
+>>>>>>> restructure

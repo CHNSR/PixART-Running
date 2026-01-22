@@ -64,4 +64,3 @@ export '../screens/layer2/p4-child/cardswiper.dart';
 export '../screens/layer2/p4-child/component.dart';
 export '../screens/p5-child/edite_profile.dart';
 export '../screens/p5-child/CPediteprofile.dart';
-export '../screen/layer2/p5-child/profilePick.dart'; // Note: 'screen' folder (singular)

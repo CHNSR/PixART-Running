@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:introduction_screen/introduction_screen.dart';
 import 'package:testbar4/routes/icon_path.dart';
+import 'package:testbar4/routes/routes.dart';
 
 class P1Intro extends StatefulWidget {
   P1Intro({super.key});
@@ -37,7 +38,7 @@ class _P1IntroState extends State<P1Intro> {
           style: TextStyle(color: Colors.black),
         ),
         onDone: () {
-          Navigator.pushNamed(context, '/p7');
+          Navigator.pushNamed(context, Routes.p7);
         },
         skip: const Text(
           'Skip',
